@@ -1,0 +1,77 @@
+import { Injectable, inject } from '@angular/core';
+import {
+  Firestore,
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  query,
+  where,
+  orderBy,
+  collectionData,
+  Timestamp
+} from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
+import { Task } from '../models/task.model';
+import { AuthService } from './auth.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class TaskService {
+  private firestore: Firestore = inject(Firestore);
+  private authService: AuthService = inject(AuthService);
+  private tasksCollection = collection(this.firestore, 'tasks');
+
+  // Get all tasks for current user with real-time updates
+  getUserTasks(): Observable<Task[]> {
+    const userId = this.authService.getCurrentUser()?.uid;
+    if (!userId) throw new Error('User not authenticated');
+
+    const tasksQuery = query(
+      this.tasksCollection,
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc')
+    );
+
+    return collectionData(tasksQuery, { idField: 'id' }) as Observable<Task[]>;
+  }
+
+  // Create new task
+  async createTask(title: string, description: string): Promise<void> {
+    const userId = this.authService.getCurrentUser()?.uid;
+    if (!userId) throw new Error('User not authenticated');
+
+    const task = {
+      title,
+      description,
+      completed: false,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+      userId
+    };
+
+    await addDoc(this.tasksCollection, task);
+  }
+
+  // Update task
+  async updateTask(taskId: string, updates: Partial<Task>): Promise<void> {
+    const taskDoc = doc(this.firestore, `tasks/${taskId}`);
+    await updateDoc(taskDoc, {
+      ...updates,
+      updatedAt: Timestamp.now()
+    });
+  }
+
+  // Delete task
+  async deleteTask(taskId: string): Promise<void> {
+    const taskDoc = doc(this.firestore, `tasks/${taskId}`);
+    await deleteDoc(taskDoc);
+  }
+
+  // Toggle task completion
+  async toggleTaskCompletion(taskId: string, completed: boolean): Promise<void> {
+    await this.updateTask(taskId, { completed });
+  }
+}
