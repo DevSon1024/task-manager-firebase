@@ -19,7 +19,6 @@ export class NavbarComponent implements OnInit {
   userProfile: UserProfile | null = null;
   greeting: string = '';
   isProfileMenuOpen = false;
-  isSettingsModalOpen = false;
 
   ngOnInit(): void {
     this.loadUserData();
@@ -29,31 +28,65 @@ export class NavbarComponent implements OnInit {
   private loadUserData(): void {
     this.userProfileService.userProfile$.subscribe(profile => {
       this.userProfile = profile;
+      console.log('User profile loaded:', profile);
     });
   }
 
-  toggleProfileMenu(): void {
+  toggleProfileMenu(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
+    console.log('Menu toggled:', this.isProfileMenuOpen);
   }
 
   closeProfileMenu(): void {
     this.isProfileMenuOpen = false;
   }
 
-  openSettings(): void {
+  openSettings(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    console.log('Opening settings...');
     this.closeProfileMenu();
-    this.router.navigate(['/settings']);
+    this.router.navigate(['/settings']).then(success => {
+      console.log('Navigation to settings:', success);
+    });
   }
 
-  openProfile(): void {
+  openProfile(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    console.log('Opening profile...');
     this.closeProfileMenu();
-    this.router.navigate(['/profile']);
+    this.router.navigate(['/profile']).then(success => {
+      console.log('Navigation to profile:', success);
+    });
   }
 
-  async logout(): Promise<void> {
+  goToTasks(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    this.closeProfileMenu();
+    this.router.navigate(['/tasks']);
+  }
+
+  async logout(event?: Event): Promise<void> {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     try {
-      await this.authService.logout();
+      console.log('Logging out...');
       this.closeProfileMenu();
+      await this.authService.logout();
     } catch (error) {
       console.error('Logout error:', error);
     }

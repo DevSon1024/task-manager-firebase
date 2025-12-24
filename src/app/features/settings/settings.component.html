@@ -46,6 +46,7 @@
             <div class="grid grid-cols-3 gap-4">
               <button 
                 *ngFor="let theme of themes"
+                type="button"
                 (click)="setTheme(theme.value)"
                 [class.ring-2]="settings.theme === theme.value"
                 [class.ring-blue-500]="settings.theme === theme.value"

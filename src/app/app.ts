@@ -18,12 +18,22 @@ import { filter } from 'rxjs';
         </div>
       </div>
     } @else {
-      @if (showNavbar) {
-        <app-navbar></app-navbar>
-      }
-      <router-outlet></router-outlet>
+      <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+        @if (showNavbar) {
+          <app-navbar></app-navbar>
+        }
+        <main>
+          <router-outlet></router-outlet>
+        </main>
+      </div>
     }
-  `
+  `,
+  styles: [`
+    :host {
+      display: block;
+      min-height: 100vh;
+    }
+  `]
 })
 export class App implements OnInit {
   private auth = inject(Auth);
@@ -32,6 +42,8 @@ export class App implements OnInit {
   showNavbar = false;
 
   ngOnInit() {
+    console.log('App initialized');
+    
     // Listen to auth state changes
     authState(this.auth).subscribe((user) => {
       this.loading = false;
@@ -40,8 +52,9 @@ export class App implements OnInit {
         console.log('User is logged in:', user.email);
         this.updateNavbarVisibility();
         
-        // User is logged in, navigate to tasks if on login page
         const currentPath = this.router.url;
+        console.log('Current path:', currentPath);
+        
         if (currentPath === '/login' || currentPath === '/register' || currentPath === '/') {
           this.router.navigate(['/tasks']);
         }
@@ -49,7 +62,6 @@ export class App implements OnInit {
         console.log('No user logged in');
         this.showNavbar = false;
         
-        // User is not logged in, redirect to login if trying to access protected routes
         const currentPath = this.router.url;
         if (currentPath !== '/login' && currentPath !== '/register') {
           this.router.navigate(['/login']);
@@ -60,7 +72,8 @@ export class App implements OnInit {
     // Listen to route changes
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
-    ).subscribe(() => {
+    ).subscribe((event) => {
+      console.log('Navigation ended:', (event as NavigationEnd).url);
       this.updateNavbarVisibility();
     });
   }
@@ -69,5 +82,6 @@ export class App implements OnInit {
     const currentPath = this.router.url;
     const isAuthPage = currentPath === '/login' || currentPath === '/register';
     this.showNavbar = this.auth.currentUser !== null && !isAuthPage;
+    console.log('Show navbar:', this.showNavbar, 'Path:', currentPath);
   }
 }
