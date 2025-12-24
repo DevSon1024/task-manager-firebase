@@ -7,22 +7,89 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   
-  <!-- Prevent flash of unstyled content -->
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="Task Manager - Organize Your Tasks">
+  <meta name="description" content="A modern task management application to help you stay organized and productive.">
+  <meta name="keywords" content="task manager, todo list, productivity, task organizer">
+  <meta name="author" content="Your Name">
+  
+  <!-- Theme Color for Browser URL Bar (will be updated dynamically) -->
+  <meta name="theme-color" content="#ffffff" id="theme-color-meta">
+  
+  <!-- For iOS Safari -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" id="apple-status-bar-meta">
+  <meta name="apple-mobile-web-app-title" content="Task Manager">
+  
+  <!-- For Microsoft Tiles -->
+  <meta name="msapplication-TileColor" content="#2563eb">
+  <meta name="msapplication-navbutton-color" content="#2563eb">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Task Manager">
+  <meta property="og:description" content="A modern task management application">
+  <meta property="og:image" content="/assets/og-image.png">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:title" content="Task Manager">
+  <meta property="twitter:description" content="A modern task management application">
+  
+  <!-- Prevent flash of unstyled content and set theme color -->
   <script>
     // Apply saved theme before page loads to prevent flash
     (function() {
       const savedTheme = localStorage.getItem('theme') || 'light';
       
+      // Theme colors
+      const themeColors = {
+        light: {
+          main: '#ffffff',        // White background
+          status: 'default'       // iOS status bar style
+        },
+        dark: {
+          main: '#111827',        // Dark gray background (gray-900)
+          status: 'black-translucent'  // iOS status bar style
+        }
+      };
+      
+      let appliedTheme = 'light';
+      
       if (savedTheme === 'dark') {
         document.documentElement.classList.add('dark');
+        appliedTheme = 'dark';
       } else if (savedTheme === 'auto') {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (prefersDark) {
           document.documentElement.classList.add('dark');
+          appliedTheme = 'dark';
         }
       }
+      
+      // Set theme color for browser URL bar
+      const themeColorMeta = document.getElementById('theme-color-meta');
+      const appleStatusBarMeta = document.getElementById('apple-status-bar-meta');
+      
+      if (themeColorMeta) {
+        themeColorMeta.setAttribute('content', themeColors[appliedTheme].main);
+      }
+      
+      if (appleStatusBarMeta) {
+        appleStatusBarMeta.setAttribute('content', themeColors[appliedTheme].status);
+      }
+      
+      console.log('Initial theme color set to:', themeColors[appliedTheme].main);
     })();
   </script>
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Favicons for different devices -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
 </head>
 <body class="bg-gray-50 dark:bg-gray-900">
   <app-root></app-root>

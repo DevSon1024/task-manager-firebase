@@ -222,10 +222,26 @@ export class UserProfileService {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     mediaQuery.removeEventListener('change', this.handleSystemThemeChange);
 
+    // Theme colors for browser URL bar
+    const themeColors = {
+      light: {
+        main: '#ffffff', // White
+        status: 'default', // iOS status bar
+      },
+      dark: {
+        main: '#111827', // gray-900
+        status: 'black-translucent', // iOS status bar
+      },
+    };
+
+    let appliedTheme: 'light' | 'dark' = 'light';
+
     if (theme === 'auto') {
       // Check system preference
       const prefersDark = mediaQuery.matches;
       console.log('Auto mode - system prefers dark:', prefersDark);
+
+      appliedTheme = prefersDark ? 'dark' : 'light';
 
       if (prefersDark) {
         document.documentElement.classList.add('dark');
@@ -238,13 +254,50 @@ export class UserProfileService {
     } else if (theme === 'dark') {
       console.log('Setting dark mode');
       document.documentElement.classList.add('dark');
+      appliedTheme = 'dark';
     } else {
       console.log('Setting light mode');
       document.documentElement.classList.remove('dark');
+      appliedTheme = 'light';
     }
+
+    // Update browser theme color (URL bar color on mobile)
+    this.updateBrowserThemeColor(themeColors[appliedTheme].main, themeColors[appliedTheme].status);
 
     // Log the current classes for debugging
     console.log('Document classes:', document.documentElement.className);
+    console.log('Browser theme color set to:', themeColors[appliedTheme].main);
+  }
+  private updateBrowserThemeColor(color: string, statusBarStyle: string): void {
+    // Update standard theme-color meta tag
+    let themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    if (themeColorMeta) {
+      themeColorMeta.setAttribute('content', color);
+    } else {
+      themeColorMeta = document.createElement('meta');
+      themeColorMeta.setAttribute('name', 'theme-color');
+      themeColorMeta.setAttribute('content', color);
+      document.head.appendChild(themeColorMeta);
+    }
+
+    // Update iOS status bar style
+    let appleStatusBarMeta = document.querySelector(
+      'meta[name="apple-mobile-web-app-status-bar-style"]'
+    );
+    if (appleStatusBarMeta) {
+      appleStatusBarMeta.setAttribute('content', statusBarStyle);
+    } else {
+      appleStatusBarMeta = document.createElement('meta');
+      appleStatusBarMeta.setAttribute('name', 'apple-mobile-web-app-status-bar-style');
+      appleStatusBarMeta.setAttribute('content', statusBarStyle);
+      document.head.appendChild(appleStatusBarMeta);
+    }
+
+    // Update Microsoft tile color
+    let msTileColorMeta = document.querySelector('meta[name="msapplication-TileColor"]');
+    if (msTileColorMeta) {
+      msTileColorMeta.setAttribute('content', color);
+    }
   }
 
   /**
@@ -269,11 +322,21 @@ export class UserProfileService {
     console.log('System theme changed:', e.matches ? 'dark' : 'light');
 
     if (this.getTheme() === 'auto') {
+      const themeColors = {
+        light: { main: '#ffffff', status: 'default' },
+        dark: { main: '#111827', status: 'black-translucent' },
+      };
+
+      const theme = e.matches ? 'dark' : 'light';
+
       if (e.matches) {
         document.documentElement.classList.add('dark');
       } else {
         document.documentElement.classList.remove('dark');
       }
+
+      // Update browser theme color
+      this.updateBrowserThemeColor(themeColors[theme].main, themeColors[theme].status);
     }
   };
 
