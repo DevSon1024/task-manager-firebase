@@ -9,7 +9,8 @@ import {
   signInWithPopup,
   User as FirebaseUser,
   setPersistence,
-  browserLocalPersistence
+  browserLocalPersistence,
+  indexedDBLocalPersistence
 } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -32,18 +33,22 @@ export class AuthService {
   // Initialize persistence settings
   private async initializePersistence(): Promise<void> {
     try {
-      await setPersistence(this.auth, browserLocalPersistence);
-      console.log('Auth persistence set to LOCAL');
+      // Try indexedDB first, fallback to localStorage
+      await setPersistence(this.auth, indexedDBLocalPersistence);
+      console.log('Auth persistence set to IndexedDB');
     } catch (error) {
-      console.error('Error setting persistence:', error);
+      try {
+        await setPersistence(this.auth, browserLocalPersistence);
+        console.log('Auth persistence set to Local Storage');
+      } catch (err) {
+        console.error('Error setting persistence:', err);
+      }
     }
   }
 
   // Email & Password Login
   async login(email: string, password: string): Promise<void> {
     try {
-      // Ensure persistence is set before login
-      await setPersistence(this.auth, browserLocalPersistence);
       await signInWithEmailAndPassword(this.auth, email, password);
       this.router.navigate(['/tasks']);
     } catch (error: any) {
@@ -54,8 +59,6 @@ export class AuthService {
   // Email & Password Registration
   async register(email: string, password: string): Promise<void> {
     try {
-      // Ensure persistence is set before registration
-      await setPersistence(this.auth, browserLocalPersistence);
       await createUserWithEmailAndPassword(this.auth, email, password);
       this.router.navigate(['/tasks']);
     } catch (error: any) {
@@ -66,8 +69,6 @@ export class AuthService {
   // Google Sign-In
   async loginWithGoogle(): Promise<void> {
     try {
-      // Ensure persistence is set before Google login
-      await setPersistence(this.auth, browserLocalPersistence);
       const provider = new GoogleAuthProvider();
       await signInWithPopup(this.auth, provider);
       this.router.navigate(['/tasks']);

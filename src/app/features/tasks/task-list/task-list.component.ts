@@ -2,10 +2,9 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { Timestamp } from 'firebase/firestore'; // Import Timestamp
+import { Timestamp } from 'firebase/firestore';
 import { Task } from '../../../core/models/task.model';
 import { TaskService } from '../../../core/services/task.service';
-import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-task-list',
@@ -16,13 +15,11 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class TaskListComponent implements OnInit {
   private taskService = inject(TaskService);
-  private authService = inject(AuthService);
 
   tasks$!: Observable<Task[]>;
   showAddForm = false;
   editingTaskId: string | null = null;
 
-  // Added dueDate string for form binding
   newTask = {
     title: '',
     description: '',
@@ -44,7 +41,6 @@ export class TaskListComponent implements OnInit {
     if (!this.newTask.title.trim()) return;
 
     try {
-      // Convert string date to Date object if present
       const dueDateObj = this.newTask.dueDate ? new Date(this.newTask.dueDate) : null;
       
       await this.taskService.createTask(
@@ -62,7 +58,6 @@ export class TaskListComponent implements OnInit {
   startEdit(task: Task) {
     this.editingTaskId = task.id!;
     
-    // Convert Firestore Timestamp to YYYY-MM-DD string for input
     let dateStr = '';
     if (task.dueDate) {
       dateStr = task.dueDate.toDate().toISOString().split('T')[0];
@@ -88,7 +83,6 @@ export class TaskListComponent implements OnInit {
       const updates: Partial<Task> = {
         title: this.editTask.title,
         description: this.editTask.description,
-        // Convert string back to Timestamp for update
         dueDate: this.editTask.dueDate ? Timestamp.fromDate(new Date(this.editTask.dueDate)) : null
       };
 
@@ -115,9 +109,5 @@ export class TaskListComponent implements OnInit {
     } catch (error) {
       console.error('Error toggling task:', error);
     }
-  }
-
-  async onLogout() {
-    await this.authService.logout();
   }
 }
