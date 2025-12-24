@@ -8,6 +8,7 @@ interface ThemeOption {
   value: 'light' | 'dark' | 'auto';
   label: string;
   icon: string;
+  description: string;
 }
 
 interface LanguageOption {
@@ -31,8 +32,11 @@ export class SettingsComponent implements OnInit {
   private userProfileService = inject(UserProfileService);
   private router = inject(Router);
 
+  // Theme is stored separately in localStorage
+  currentTheme: 'light' | 'dark' | 'auto' = 'light';
+
+  // Other settings stored in Firebase
   settings: UserSettings = {
-    theme: 'light',
     notifications: true,
     emailNotifications: true,
     language: 'en',
@@ -44,9 +48,24 @@ export class SettingsComponent implements OnInit {
   errorMessage = '';
 
   themes: ThemeOption[] = [
-    { value: 'light', label: 'Light', icon: '☀️' },
-    { value: 'dark', label: 'Dark', icon: '🌙' },
-    { value: 'auto', label: 'Auto', icon: '⚡' }
+    { 
+      value: 'light', 
+      label: 'Light', 
+      icon: '☀️',
+      description: 'Bright and clear'
+    },
+    { 
+      value: 'dark', 
+      label: 'Dark', 
+      icon: '🌙',
+      description: 'Easy on the eyes'
+    },
+    { 
+      value: 'auto', 
+      label: 'Auto', 
+      icon: '⚡',
+      description: 'Follows system'
+    }
   ];
 
   languages: LanguageOption[] = [
@@ -63,7 +82,9 @@ export class SettingsComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    console.log('SettingsComponent initialized!');
     this.loadSettings();
+    this.loadTheme();
   }
 
   private loadSettings(): void {
@@ -72,8 +93,17 @@ export class SettingsComponent implements OnInit {
     });
   }
 
+  private loadTheme(): void {
+    this.currentTheme = this.userProfileService.getTheme();
+    console.log('Current theme loaded:', this.currentTheme);
+  }
+
   setTheme(theme: 'light' | 'dark' | 'auto'): void {
-    this.settings.theme = theme;
+    this.currentTheme = theme;
+    this.userProfileService.setTheme(theme);
+    
+    // Show instant feedback
+    this.showSuccessMessage('Theme changed successfully!');
   }
 
   async saveSettings(): Promise<void> {
@@ -83,16 +113,19 @@ export class SettingsComponent implements OnInit {
 
     try {
       await this.userProfileService.saveSettings(this.settings);
-      this.successMessage = 'Settings saved successfully!';
-      
-      setTimeout(() => {
-        this.successMessage = '';
-      }, 3000);
+      this.showSuccessMessage('Settings saved successfully!');
     } catch (error: any) {
       this.errorMessage = error.message || 'Failed to save settings';
     } finally {
       this.isSaving = false;
     }
+  }
+
+  private showSuccessMessage(message: string): void {
+    this.successMessage = message;
+    setTimeout(() => {
+      this.successMessage = '';
+    }, 3000);
   }
 
   goBack(): void {

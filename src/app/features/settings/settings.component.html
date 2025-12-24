@@ -16,13 +16,23 @@
 
     <!-- Alert Messages -->
     <div *ngIf="successMessage" 
-         class="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-      <p class="text-sm text-green-800 dark:text-green-200">{{ successMessage }}</p>
+         class="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg animate-fade-in">
+      <div class="flex items-center">
+        <svg class="h-5 w-5 text-green-600 dark:text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <p class="text-sm text-green-800 dark:text-green-200">{{ successMessage }}</p>
+      </div>
     </div>
 
     <div *ngIf="errorMessage" 
-         class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-      <p class="text-sm text-red-800 dark:text-red-200">{{ errorMessage }}</p>
+         class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg animate-fade-in">
+      <div class="flex items-center">
+        <svg class="h-5 w-5 text-red-600 dark:text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+        <p class="text-sm text-red-800 dark:text-red-200">{{ errorMessage }}</p>
+      </div>
     </div>
 
     <!-- Settings Sections -->
@@ -34,27 +44,49 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                   d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
           </svg>
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Appearance</h2>
+          <div>
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Appearance</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Saved locally in your browser</p>
+          </div>
         </div>
 
         <div class="space-y-4">
           <!-- Theme Selection -->
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              Theme
+              Theme Preference
             </label>
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <button 
                 *ngFor="let theme of themes"
                 type="button"
                 (click)="setTheme(theme.value)"
-                [class.ring-2]="settings.theme === theme.value"
-                [class.ring-blue-500]="settings.theme === theme.value"
-                class="flex flex-col items-center justify-center p-4 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 transition-all">
-                <span class="text-3xl mb-2">{{ theme.icon }}</span>
-                <span class="text-sm font-medium text-gray-900 dark:text-white">{{ theme.label }}</span>
+                [class.ring-2]="currentTheme === theme.value"
+                [class.ring-blue-500]="currentTheme === theme.value"
+                [class.bg-blue-50]="currentTheme === theme.value"
+                [class.dark:bg-blue-900/20]="currentTheme === theme.value"
+                class="flex flex-col items-center justify-center p-4 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 transition-all cursor-pointer relative">
+                <span class="text-4xl mb-2">{{ theme.icon }}</span>
+                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ theme.label }}</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ theme.description }}</span>
+                
+                <!-- Selected indicator -->
+                <div *ngIf="currentTheme === theme.value" 
+                     class="absolute top-2 right-2">
+                  <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
               </button>
             </div>
+            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+              <span class="inline-flex items-center">
+                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Theme preference is saved locally and applies instantly
+              </span>
+            </p>
           </div>
         </div>
       </div>
@@ -66,7 +98,10 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                   d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
           </svg>
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Notifications</h2>
+          <div>
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Notifications</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Synced across devices</p>
+          </div>
         </div>
 
         <div class="space-y-4">
@@ -109,7 +144,10 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                   d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
           </svg>
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Preferences</h2>
+          <div>
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Preferences</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Synced across devices</p>
+          </div>
         </div>
 
         <div class="space-y-4">
@@ -153,7 +191,7 @@
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          {{ isSaving ? 'Saving...' : 'Save Settings' }}
+          {{ isSaving ? 'Saving...' : 'Save Preferences' }}
         </button>
       </div>
     </div>
