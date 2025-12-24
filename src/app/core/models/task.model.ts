@@ -5,6 +5,7 @@ export interface Task {
   title: string;
   description: string;
   completed: boolean;
+  dueDate: Timestamp | null;
   createdAt: Timestamp;
   updatedAt: Timestamp;
   userId: string;

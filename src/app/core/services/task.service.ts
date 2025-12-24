@@ -24,7 +24,7 @@ export class TaskService {
   private authService: AuthService = inject(AuthService);
   private tasksCollection = collection(this.firestore, 'tasks');
 
-  // Get all tasks for current user with real-time updates
+  // Get all tasks for current user
   getUserTasks(): Observable<Task[]> {
     const userId = this.authService.getCurrentUser()?.uid;
     if (!userId) throw new Error('User not authenticated');
@@ -38,8 +38,8 @@ export class TaskService {
     return collectionData(tasksQuery, { idField: 'id' }) as Observable<Task[]>;
   }
 
-  // Create new task
-  async createTask(title: string, description: string): Promise<void> {
+  // Create new task with optional due date
+  async createTask(title: string, description: string, dueDate: Date | null): Promise<void> {
     const userId = this.authService.getCurrentUser()?.uid;
     if (!userId) throw new Error('User not authenticated');
 
@@ -47,6 +47,7 @@ export class TaskService {
       title,
       description,
       completed: false,
+      dueDate: dueDate ? Timestamp.fromDate(dueDate) : null,
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
       userId
@@ -64,13 +65,11 @@ export class TaskService {
     });
   }
 
-  // Delete task
   async deleteTask(taskId: string): Promise<void> {
     const taskDoc = doc(this.firestore, `tasks/${taskId}`);
     await deleteDoc(taskDoc);
   }
 
-  // Toggle task completion
   async toggleTaskCompletion(taskId: string, completed: boolean): Promise<void> {
     await this.updateTask(taskId, { completed });
   }
