@@ -47,25 +47,17 @@ export class App implements OnInit {
     // Listen to auth state changes
     authState(this.auth).subscribe((user) => {
       this.loading = false;
+      this.updateNavbarVisibility();
       
       if (user) {
         console.log('User is logged in:', user.email);
-        this.updateNavbarVisibility();
-        
+        // Redirect to tasks if user is already on public pages (Login/Register)
         const currentPath = this.router.url;
-        console.log('Current path:', currentPath);
-        
-        if (currentPath === '/login' || currentPath === '/register' || currentPath === '/') {
+        if (currentPath === '/login' || currentPath === '/register') {
           this.router.navigate(['/tasks']);
         }
       } else {
         console.log('No user logged in');
-        this.showNavbar = false;
-        
-        const currentPath = this.router.url;
-        if (currentPath !== '/login' && currentPath !== '/register') {
-          this.router.navigate(['/login']);
-        }
       }
     });
 
@@ -80,8 +72,24 @@ export class App implements OnInit {
 
   private updateNavbarVisibility(): void {
     const currentPath = this.router.url;
-    const isAuthPage = currentPath === '/login' || currentPath === '/register';
+    // Navbar hidden on landing page, login, register, and 404/error pages if we want
+    // But typically we might want navbar on Landing? 
+    // The previous logic was: show if currentUser != null.
+    // Let's keep it simple: Show navbar ONLY when logged in, and NOT on auth pages.
+    // Maybe we want a different navbar for Landing? Use LandingComponent's internal navbar for now.
+    
+    const isAuthPage = currentPath === '/login' || currentPath === '/register' || currentPath === '/';
     this.showNavbar = this.auth.currentUser !== null && !isAuthPage;
+    
+    // Actually, if we are on Landing Page ('/'), we might NOT want the *App* navbar (which has dashboard links).
+    // The LandingComponent has its own Navbar.
+    // So hiding it on '/' is correct.
+    
+    // Also hide if path is '/'
+    if (currentPath === '/') {
+        this.showNavbar = false;
+    }
+    
     console.log('Show navbar:', this.showNavbar, 'Path:', currentPath);
   }
 }

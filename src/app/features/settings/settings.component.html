@@ -61,17 +61,17 @@
                 *ngFor="let theme of themes"
                 type="button"
                 (click)="setTheme(theme.value)"
-                [class.ring-2]="currentTheme === theme.value"
-                [class.ring-blue-500]="currentTheme === theme.value"
-                [class.bg-blue-50]="currentTheme === theme.value"
-                [class.dark:bg-blue-900/20]="currentTheme === theme.value"
+                [class.ring-2]="currentTheme() === theme.value"
+                [class.ring-blue-500]="currentTheme() === theme.value"
+                [class.bg-blue-50]="currentTheme() === theme.value"
+                [class.dark:bg-blue-900/20]="currentTheme() === theme.value"
                 class="flex flex-col items-center justify-center p-4 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 transition-all cursor-pointer relative">
                 <span class="text-4xl mb-2">{{ theme.icon }}</span>
                 <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ theme.label }}</span>
                 <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ theme.description }}</span>
                 
                 <!-- Selected indicator -->
-                <div *ngIf="currentTheme === theme.value" 
+                <div *ngIf="currentTheme() === theme.value" 
                      class="absolute top-2 right-2">
                   <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>

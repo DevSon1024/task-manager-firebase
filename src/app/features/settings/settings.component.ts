@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserProfileService, UserSettings } from '../../core/services/user-profile.service';
+import { ThemeService, Theme } from '../../core/services/theme.service';
 
 interface ThemeOption {
-  value: 'light' | 'dark' | 'auto';
+  value: Theme;
   label: string;
   icon: string;
   description: string;
@@ -30,10 +31,11 @@ interface TimezoneOption {
 })
 export class SettingsComponent implements OnInit {
   private userProfileService = inject(UserProfileService);
+  private themeService = inject(ThemeService);
   private router = inject(Router);
 
-  // Theme is stored separately in localStorage
-  currentTheme: 'light' | 'dark' | 'auto' = 'light';
+  // Read theme from ThemeService signal
+  currentTheme = this.themeService.theme;
 
   // Other settings stored in Firebase
   settings: UserSettings = {
@@ -61,8 +63,8 @@ export class SettingsComponent implements OnInit {
       description: 'Easy on the eyes'
     },
     { 
-      value: 'auto', 
-      label: 'Auto', 
+      value: 'system', 
+      label: 'System', 
       icon: '⚡',
       description: 'Follows system'
     }
@@ -82,9 +84,7 @@ export class SettingsComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    console.log('SettingsComponent initialized!');
     this.loadSettings();
-    this.loadTheme();
   }
 
   private loadSettings(): void {
@@ -93,16 +93,8 @@ export class SettingsComponent implements OnInit {
     });
   }
 
-  private loadTheme(): void {
-    this.currentTheme = this.userProfileService.getTheme();
-    console.log('Current theme loaded:', this.currentTheme);
-  }
-
-  setTheme(theme: 'light' | 'dark' | 'auto'): void {
-    this.currentTheme = theme;
-    this.userProfileService.setTheme(theme);
-    
-    // Show instant feedback
+  setTheme(theme: Theme): void {
+    this.themeService.setTheme(theme);
     this.showSuccessMessage('Theme changed successfully!');
   }
 

@@ -1,0 +1,60 @@
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 border border-gray-200 dark:border-gray-700">
+  <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Create New Task</h2>
+  <form (ngSubmit)="onAddTask()" class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Task Title *
+      </label>
+      <input 
+        [(ngModel)]="newTask.title" 
+        name="title"
+        type="text" 
+        required
+        [disabled]="isSubmitting"
+        placeholder="Enter task title..."
+        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white disabled:opacity-50">
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Description
+      </label>
+      <textarea 
+        [(ngModel)]="newTask.description" 
+        name="description"
+        rows="3"
+        [disabled]="isSubmitting"
+        placeholder="Add task description..."
+        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white disabled:opacity-50"></textarea>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Due Date
+      </label>
+      <input 
+        [(ngModel)]="newTask.dueDate" 
+        name="dueDate"
+        type="date"
+        [disabled]="isSubmitting"
+        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white disabled:opacity-50">
+    </div>
+
+    <div class="flex justify-end space-x-3">
+      <button 
+        type="button"
+        (click)="onCancel()"
+        [disabled]="isSubmitting"
+        class="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50">
+        Cancel
+      </button>
+      <button 
+        type="submit"
+        [disabled]="isSubmitting"
+        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center">
+        <span *ngIf="isSubmitting" class="mr-2">...</span>
+        Add Task
+      </button>
+    </div>
+  </form>
+</div>
