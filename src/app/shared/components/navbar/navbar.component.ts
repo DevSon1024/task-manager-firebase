@@ -29,7 +29,7 @@ export class NavbarComponent implements OnInit {
   private loadUserData(): void {
     this.userProfileService.userProfile$.subscribe(profile => {
       this.userProfile = profile;
-      console.log('User profile loaded:', profile);
+      // console.log('User profile loaded:', profile);
     });
   }
 
@@ -39,7 +39,7 @@ export class NavbarComponent implements OnInit {
       event.stopPropagation();
     }
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
-    console.log('Menu toggled:', this.isProfileMenuOpen);
+    // console.log('Menu toggled:', this.isProfileMenuOpen);
   }
 
   closeProfileMenu(): void {
@@ -51,10 +51,10 @@ export class NavbarComponent implements OnInit {
       event.preventDefault();
       event.stopPropagation();
     }
-    console.log('Opening settings...');
+    // console.log('Opening settings...');
     this.closeProfileMenu();
     this.router.navigate(['/settings']).then(success => {
-      console.log('Navigation to settings:', success);
+      // console.log('Navigation to settings:', success);
     });
   }
 
@@ -63,10 +63,10 @@ export class NavbarComponent implements OnInit {
       event.preventDefault();
       event.stopPropagation();
     }
-    console.log('Opening profile...');
+    // console.log('Opening profile...');
     this.closeProfileMenu();
     this.router.navigate(['/profile']).then(success => {
-      console.log('Navigation to profile:', success);
+      // console.log('Navigation to profile:', success);
     });
   }
 
@@ -85,7 +85,7 @@ export class NavbarComponent implements OnInit {
       event.stopPropagation();
     }
     try {
-      console.log('Logging out...');
+      // console.log('Logging out...');
       this.closeProfileMenu();
       await this.authService.logout();
     } catch (error) {

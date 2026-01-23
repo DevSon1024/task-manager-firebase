@@ -198,7 +198,7 @@ export class UserProfileService {
    * Save theme preference to localStorage and apply it
    */
   setTheme(theme: 'light' | 'dark' | 'auto'): void {
-    console.log('Setting theme to:', theme);
+    // console.log('Setting theme to:', theme);
     localStorage.setItem('theme', theme);
     this.applyTheme(theme);
   }
@@ -208,7 +208,7 @@ export class UserProfileService {
    */
   private applySavedTheme(): void {
     const savedTheme = this.getTheme();
-    console.log('Applying saved theme:', savedTheme);
+    // console.log('Applying saved theme:', savedTheme);
     this.applyTheme(savedTheme);
   }
 
@@ -216,7 +216,7 @@ export class UserProfileService {
    * Apply theme to the document
    */
   private applyTheme(theme: 'light' | 'dark' | 'auto'): void {
-    console.log('Applying theme:', theme);
+    // console.log('Applying theme:', theme);
 
     // Remove existing listener
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -239,7 +239,7 @@ export class UserProfileService {
     if (theme === 'auto') {
       // Check system preference
       const prefersDark = mediaQuery.matches;
-      console.log('Auto mode - system prefers dark:', prefersDark);
+      // console.log('Auto mode - system prefers dark:', prefersDark);
 
       appliedTheme = prefersDark ? 'dark' : 'light';
 
@@ -252,11 +252,11 @@ export class UserProfileService {
       // Listen for system theme changes
       mediaQuery.addEventListener('change', this.handleSystemThemeChange);
     } else if (theme === 'dark') {
-      console.log('Setting dark mode');
+      // console.log('Setting dark mode');
       document.documentElement.classList.add('dark');
       appliedTheme = 'dark';
     } else {
-      console.log('Setting light mode');
+      // console.log('Setting light mode');
       document.documentElement.classList.remove('dark');
       appliedTheme = 'light';
     }
@@ -265,8 +265,8 @@ export class UserProfileService {
     this.updateBrowserThemeColor(themeColors[appliedTheme].main, themeColors[appliedTheme].status);
 
     // Log the current classes for debugging
-    console.log('Document classes:', document.documentElement.className);
-    console.log('Browser theme color set to:', themeColors[appliedTheme].main);
+    // console.log('Document classes:', document.documentElement.className);
+    // console.log('Browser theme color set to:', themeColors[appliedTheme].main);
   }
   private updateBrowserThemeColor(color: string, statusBarStyle: string): void {
     // Update standard theme-color meta tag
@@ -319,7 +319,7 @@ export class UserProfileService {
    * Handle system theme changes
    */
   private handleSystemThemeChange = (e: MediaQueryListEvent): void => {
-    console.log('System theme changed:', e.matches ? 'dark' : 'light');
+    // console.log('System theme changed:', e.matches ? 'dark' : 'light');
 
     if (this.getTheme() === 'auto') {
       const themeColors = {

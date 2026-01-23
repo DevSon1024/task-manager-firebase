@@ -35,11 +35,11 @@ export class AuthService {
     try {
       // Try indexedDB first, fallback to localStorage
       await setPersistence(this.auth, indexedDBLocalPersistence);
-      console.log('Auth persistence set to IndexedDB');
+      // console.log('Auth persistence set to IndexedDB');
     } catch (error) {
       try {
         await setPersistence(this.auth, browserLocalPersistence);
-        console.log('Auth persistence set to Local Storage');
+        // console.log('Auth persistence set to Local Storage');
       } catch (err) {
         console.error('Error setting persistence:', err);
       }

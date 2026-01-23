@@ -44,7 +44,7 @@ export class App implements OnInit {
   showNavbar = false;
 
   ngOnInit() {
-    console.log('App initialized');
+    // console.log('App initialized');
     
     // Listen to auth state changes
     authState(this.auth).subscribe((user) => {
@@ -52,14 +52,14 @@ export class App implements OnInit {
       this.updateNavbarVisibility();
       
       if (user) {
-        console.log('User is logged in:', user.email);
+        // console.log('User is logged in:', user.email);
         // Redirect to tasks if user is already on public pages (Login/Register)
         const currentPath = this.router.url;
         if (currentPath === '/login' || currentPath === '/register') {
           this.router.navigate(['/tasks']);
         }
       } else {
-        console.log('No user logged in');
+        // console.log('No user logged in');
       }
     });
 
@@ -67,7 +67,7 @@ export class App implements OnInit {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event) => {
-      console.log('Navigation ended:', (event as NavigationEnd).url);
+      // console.log('Navigation ended:', (event as NavigationEnd).url);
       this.updateNavbarVisibility();
     });
   }
@@ -92,6 +92,6 @@ export class App implements OnInit {
         this.showNavbar = false;
     }
     
-    console.log('Show navbar:', this.showNavbar, 'Path:', currentPath);
+    // console.log('Show navbar:', this.showNavbar, 'Path:', currentPath);
   }
 }
