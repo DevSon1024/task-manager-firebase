@@ -3,12 +3,13 @@ import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { Auth, authState } from '@angular/fire/auth';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
+import { ToastComponent } from './shared/components/toast/toast.component';
 import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, NavbarComponent],
+  imports: [RouterOutlet, CommonModule, NavbarComponent, ToastComponent],
   template: `
     @if (loading) {
       <div class="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -25,6 +26,7 @@ import { filter } from 'rxjs';
         <main>
           <router-outlet></router-outlet>
         </main>
+        <app-toast></app-toast>
       </div>
     }
   `,

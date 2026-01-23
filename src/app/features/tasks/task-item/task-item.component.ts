@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Timestamp } from 'firebase/firestore';
 import { Task } from '../../../core/models/task.model';
 import { TaskService } from '../../../core/services/task.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-task-item',
@@ -16,6 +17,7 @@ export class TaskItemComponent {
   @Input() task!: Task;
   
   private taskService = inject(TaskService);
+  private toastService = inject(ToastService);
   
   isEditing = false;
   
@@ -48,7 +50,10 @@ export class TaskItemComponent {
   }
 
   async onUpdateTask() {
-    if (!this.editTaskData.title.trim()) return;
+    if (!this.editTaskData.title.trim()) {
+      this.toastService.warning('Please enter a task title');
+      return;
+    }
 
     try {
       const updates: Partial<Task> = {
@@ -58,9 +63,11 @@ export class TaskItemComponent {
       };
 
       await this.taskService.updateTask(this.task.id!, updates);
+      this.toastService.success('Task updated');
       this.isEditing = false;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating task:', error);
+      this.toastService.error(error.message || 'Failed to update task');
     }
   }
 
@@ -68,8 +75,10 @@ export class TaskItemComponent {
     if (confirm('Are you sure you want to delete this task?')) {
       try {
         await this.taskService.deleteTask(this.task.id!);
-      } catch (error) {
+        this.toastService.success('Task deleted');
+      } catch (error: any) {
         console.error('Error deleting task:', error);
+        this.toastService.error(error.message || 'Failed to delete task');
       }
     }
   }
@@ -77,8 +86,12 @@ export class TaskItemComponent {
   async onToggleComplete(completed: boolean) {
     try {
       await this.taskService.toggleTaskCompletion(this.task.id!, !completed);
-    } catch (error) {
+      // Optional: Toast for toggle might be too noisy, but requested "process notify".
+      // Keeping it subtle or omitting if too noisy. Let's add it for completeness.
+      this.toastService.info(completed ? 'Task marked active' : 'Task completed', 2000);
+    } catch (error: any) {
       console.error('Error toggling task:', error);
+      this.toastService.error(error.message || 'Failed to update task status');
     }
   }
 }

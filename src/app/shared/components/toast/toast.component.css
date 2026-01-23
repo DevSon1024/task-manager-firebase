@@ -1,0 +1,6 @@
+/* Mostly handled by Tailwind, but ensuring z-index is top */
+:host {
+    display: block;
+    position: relative;
+    z-index: 9999;
+}

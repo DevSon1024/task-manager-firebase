@@ -81,7 +81,7 @@ export class AuthService {
   async logout(): Promise<void> {
     try {
       await signOut(this.auth);
-      this.router.navigate(['/login']);
+      this.router.navigate(['/'], { replaceUrl: true });
     } catch (error: any) {
       throw new Error(error.message);
     }

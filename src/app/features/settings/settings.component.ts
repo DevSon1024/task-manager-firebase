@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserProfileService, UserSettings } from '../../core/services/user-profile.service';
 import { ThemeService, Theme } from '../../core/services/theme.service';
+import { ToastService } from '../../core/services/toast.service';
 
 interface ThemeOption {
   value: Theme;
@@ -32,6 +33,7 @@ interface TimezoneOption {
 export class SettingsComponent implements OnInit {
   private userProfileService = inject(UserProfileService);
   private themeService = inject(ThemeService);
+  private toastService = inject(ToastService);
   private router = inject(Router);
 
   // Read theme from ThemeService signal
@@ -46,8 +48,6 @@ export class SettingsComponent implements OnInit {
   };
 
   isSaving = false;
-  successMessage = '';
-  errorMessage = '';
 
   themes: ThemeOption[] = [
     { 
@@ -95,29 +95,20 @@ export class SettingsComponent implements OnInit {
 
   setTheme(theme: Theme): void {
     this.themeService.setTheme(theme);
-    this.showSuccessMessage('Theme changed successfully!');
+    this.toastService.success(`Theme set to ${theme}`);
   }
 
   async saveSettings(): Promise<void> {
     this.isSaving = true;
-    this.errorMessage = '';
-    this.successMessage = '';
 
     try {
       await this.userProfileService.saveSettings(this.settings);
-      this.showSuccessMessage('Settings saved successfully!');
+      this.toastService.success('Settings saved successfully!');
     } catch (error: any) {
-      this.errorMessage = error.message || 'Failed to save settings';
+      this.toastService.error(error.message || 'Failed to save settings');
     } finally {
       this.isSaving = false;
     }
-  }
-
-  private showSuccessMessage(message: string): void {
-    this.successMessage = message;
-    setTimeout(() => {
-      this.successMessage = '';
-    }, 3000);
   }
 
   goBack(): void {
