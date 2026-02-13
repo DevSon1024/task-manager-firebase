@@ -1,0 +1,60 @@
+<div class="h-full flex flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 w-64 transition-all duration-300">
+  
+  <!-- Logo Area -->
+  <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
+    <svg class="h-8 w-8 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+    </svg>
+    <span class="text-xl font-bold text-gray-900 dark:text-white">TaskFlow</span>
+  </div>
+
+  <!-- Navigation Links -->
+  <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+    
+    <!-- Admin Dashboard (Only for Admin) -->
+    <a *ngIf="isAdmin" routerLink="/admin" routerLinkActive="bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400" 
+       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group">
+       <svg class="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+       </svg>
+       Admin Dashboard
+    </a>
+
+    <!-- <a routerLink="/tasks" [queryParams]="{action: 'create'}" routerLinkActive="bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400"
+       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group">
+       <svg class="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+       </svg>
+       Create Task
+    </a> -->
+
+    <!-- My Tasks -->
+    <a routerLink="/tasks" routerLinkActive="bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400" 
+       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group">
+       <svg class="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+       </svg>
+       My Tasks
+    </a>
+
+    <!-- Create Task (Placeholder) -->
+    <!-- Assuming detailed task creation might be a modal or separate page later. For now, maybe just link to tasks or a new route if exists. Using a dummy link or creating a stub route is out of scope unless requested, sticking to existing routs. 
+         Wait, user said "page navigations like admin dashboard, create a task etc.". 
+         I don't have a 'create task' page yet, usually it's a modal in 'tasks'. 
+         I will add a button that conceptually links to 'Create Task', for now pointing to /tasks with a query param or just /tasks.
+    -->
+    
+
+    <!-- Settings -->
+    <a routerLink="/settings" routerLinkActive="bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400" 
+       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group">
+       <svg class="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+       </svg>
+       Settings
+    </a>
+
+  </nav>
+</div>

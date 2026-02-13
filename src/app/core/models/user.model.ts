@@ -1,6 +1,9 @@
 export interface User {
   uid: string;
-  email: string | null;
-  displayName: string | null;
-  photoURL: string | null;
+  email: string;
+  displayName: string;
+  photoURL?: string;
+  role?: 'admin' | 'user'; // Default 'user'
+  lastSeen?: any; // Firestore Timestamp
+  isOnline?: boolean;
 }

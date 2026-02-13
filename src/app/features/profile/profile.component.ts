@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserProfileService, UserProfile } from '../../core/services/user-profile.service';
+import { UserService } from '../../core/services/user.service';
 
 @Component({
   selector: 'app-profile',
@@ -13,6 +14,7 @@ import { UserProfileService, UserProfile } from '../../core/services/user-profil
 })
 export class ProfileComponent implements OnInit {
   private userProfileService = inject(UserProfileService);
+  private userService = inject(UserService);
   private router = inject(Router);
 
   userProfile: UserProfile | null = null;
@@ -82,5 +84,18 @@ export class ProfileComponent implements OnInit {
       return (parts[0][0] + parts[1][0]).toUpperCase();
     }
     return name.substring(0, 2).toUpperCase();
+  }
+
+  // Temporary method for development to become admin
+  async promoteToAdmin(): Promise<void> {
+    if (!this.userProfile) return;
+    try {
+      await this.userService.updateUserRole(this.userProfile.uid, 'admin');
+      alert('You are now an Admin! Please refresh the page or re-login.');
+      // location.reload();
+    } catch (error) {
+      console.error('Error promoting to admin:', error);
+      alert('Failed to promote to admin.');
+    }
   }
 }

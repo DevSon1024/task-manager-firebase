@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { adminGuard } from './core/guards/admin.guard';
 import { redirectLoggedInTo } from '@angular/fire/auth-guard'; // Optional: if you want to redirect logged in users from landing
 
 export const routes: Routes = [
@@ -35,6 +36,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent),
     canActivate: [authGuard],
     title: 'Settings'
+  },
+  {
+    path: 'admin',
+    loadComponent: () => import('./features/admin/dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+    canActivate: [authGuard, adminGuard],
+    title: 'Admin Dashboard'
   },
   {
     path: 'unauthorized',

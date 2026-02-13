@@ -3,13 +3,14 @@ import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { Auth, authState } from '@angular/fire/auth';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
+import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
 import { ToastComponent } from './shared/components/toast/toast.component';
 import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, NavbarComponent, ToastComponent],
+  imports: [RouterOutlet, CommonModule, NavbarComponent, SidebarComponent, ToastComponent],
   template: `
     @if (loading) {
       <div class="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -19,13 +20,21 @@ import { filter } from 'rxjs';
         </div>
       </div>
     } @else {
-      <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
-        @if (showNavbar) {
-          <app-navbar></app-navbar>
-        }
-        <main>
-          <router-outlet></router-outlet>
-        </main>
+      <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
+        <!-- Sidebar (Hidden on mobile by default, handled by CSS/State later if needed, for now desktop visible) -->
+        <app-sidebar *ngIf="showSidebar" class="hidden md:block w-64 flex-shrink-0 h-screen sticky top-0"></app-sidebar>
+        
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col min-h-screen min-w-0">
+           <!-- Navbar (Optional: remove if sidebar handles everything, or keep for mobile/top actions) -->
+           <!-- Let's keep navbar for mobile and for top-right actions like profile/theme -->
+           <app-navbar *ngIf="showNavbar" class="sticky top-0 z-10"></app-navbar>
+
+           <main class="flex-1 overflow-y-auto p-4">
+             <router-outlet></router-outlet>
+           </main>
+        </div>
+        
         <app-toast></app-toast>
       </div>
     }
@@ -42,6 +51,7 @@ export class App implements OnInit {
   private router = inject(Router);
   loading = true;
   showNavbar = false;
+  showSidebar = false;
 
   ngOnInit() {
     // console.log('App initialized');
@@ -49,14 +59,16 @@ export class App implements OnInit {
     // Listen to auth state changes
     authState(this.auth).subscribe((user) => {
       this.loading = false;
-      this.updateNavbarVisibility();
+      this.updateLayoutVisibility();
       
       if (user) {
         // console.log('User is logged in:', user.email);
         // Redirect to tasks if user is already on public pages (Login/Register)
         const currentPath = this.router.url;
         if (currentPath === '/login' || currentPath === '/register') {
-          this.router.navigate(['/tasks']);
+          // Verify redirection based on role is handled by auth service during login, 
+          // but for direct access/refresh:
+          // this.router.navigate(['/tasks']); // Let's leave this to AuthGuard or simple tasks for start
         }
       } else {
         // console.log('No user logged in');
@@ -68,30 +80,20 @@ export class App implements OnInit {
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event) => {
       // console.log('Navigation ended:', (event as NavigationEnd).url);
-      this.updateNavbarVisibility();
+      this.updateLayoutVisibility();
     });
   }
 
-  private updateNavbarVisibility(): void {
+  private updateLayoutVisibility(): void {
     const currentPath = this.router.url;
-    // Navbar hidden on landing page, login, register, and 404/error pages if we want
-    // But typically we might want navbar on Landing? 
-    // The previous logic was: show if currentUser != null.
-    // Let's keep it simple: Show navbar ONLY when logged in, and NOT on auth pages.
-    // Maybe we want a different navbar for Landing? Use LandingComponent's internal navbar for now.
     
-    const isAuthPage = currentPath === '/login' || currentPath === '/register' || currentPath === '/';
-    this.showNavbar = this.auth.currentUser !== null && !isAuthPage;
+    // Auth pages or landing page should not show sidebar/navbar
+    const isPublicPage = currentPath === '/login' || currentPath === '/register' || currentPath === '/';
+    const isLoggedIn = this.auth.currentUser !== null;
+
+    this.showNavbar = isLoggedIn && !isPublicPage;
+    this.showSidebar = isLoggedIn && !isPublicPage;
     
-    // Actually, if we are on Landing Page ('/'), we might NOT want the *App* navbar (which has dashboard links).
-    // The LandingComponent has its own Navbar.
-    // So hiding it on '/' is correct.
-    
-    // Also hide if path is '/'
-    if (currentPath === '/') {
-        this.showNavbar = false;
-    }
-    
-    // console.log('Show navbar:', this.showNavbar, 'Path:', currentPath);
+    // console.log('Layout:', { navbar: this.showNavbar, sidebar: this.showSidebar, path: currentPath });
   }
 }
