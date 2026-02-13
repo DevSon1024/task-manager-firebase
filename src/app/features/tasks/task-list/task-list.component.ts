@@ -7,6 +7,7 @@ import { TaskService } from '../../../core/services/task.service';
 import { TaskFormComponent } from '../task-form/task-form.component';
 import { TaskItemComponent } from '../task-item/task-item.component';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+import { ModalComponent } from '../../../shared/components/modal/modal.component';
 import { 
   CdkDragDrop, 
   moveItemInArray, 
@@ -18,7 +19,7 @@ import { ToastService } from '../../../core/services/toast.service';
 @Component({
   selector: 'app-task-list',
   standalone: true,
-  imports: [CommonModule, TaskFormComponent, TaskItemComponent, LoaderComponent, DragDropModule],
+  imports: [CommonModule, TaskFormComponent, TaskItemComponent, LoaderComponent, DragDropModule, ModalComponent],
   templateUrl: './task-list.component.html',
   styleUrls: ['./task-list.component.css']
 })
@@ -32,7 +33,8 @@ export class TaskListComponent implements OnInit {
   inProgressTasks: Task[] = [];
   doneTasks: Task[] = [];
 
-  showAddForm = false;
+  isModalOpen = false;
+  editingTask: Task | null = null;
 
   ngOnInit() {
     this.tasks$ = this.taskService.getUserTasks();
@@ -46,8 +48,19 @@ export class TaskListComponent implements OnInit {
     });
   }
 
-  toggleAddForm() {
-    this.showAddForm = !this.showAddForm;
+  openAddModal() {
+    this.editingTask = null;
+    this.isModalOpen = true;
+  }
+
+  openEditModal(task: Task) {
+    this.editingTask = task;
+    this.isModalOpen = true;
+  }
+
+  closeModal() {
+    this.isModalOpen = false;
+    this.editingTask = null;
   }
 
   async drop(event: CdkDragDrop<Task[]>) {

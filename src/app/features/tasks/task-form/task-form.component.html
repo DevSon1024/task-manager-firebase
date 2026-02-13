@@ -1,6 +1,4 @@
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 border border-gray-200 dark:border-gray-700">
-  <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Create New Task</h2>
-  <form (ngSubmit)="onAddTask()" class="space-y-4">
+  <form (ngSubmit)="onCustomSubmit()" class="space-y-4">
     <div>
       <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
         Task Title *
@@ -15,17 +13,70 @@
         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white disabled:opacity-50">
     </div>
 
+    <!-- Description with Markdown Editor -->
     <div>
       <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
         Description
       </label>
-      <textarea 
-        [(ngModel)]="newTask.description" 
-        name="description"
-        rows="3"
-        [disabled]="isSubmitting"
-        placeholder="Add task description..."
-        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white disabled:opacity-50"></textarea>
+      
+      <!-- Tabs -->
+      <div class="flex border-b border-gray-200 dark:border-gray-700 mb-2">
+        <button type="button" 
+                (click)="activeTab = 'write'"
+                [class.border-blue-500]="activeTab === 'write'"
+                [class.text-blue-600]="activeTab === 'write'"
+                class="px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 border-b-2 border-transparent transition-colors">
+            Write
+        </button>
+        <button type="button" 
+                (click)="activeTab = 'preview'"
+                [class.border-blue-500]="activeTab === 'preview'"
+                [class.text-blue-600]="activeTab === 'preview'"
+                class="px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 border-b-2 border-transparent transition-colors">
+            Preview
+        </button>
+      </div>
+
+      <!-- Write Tab -->
+      <div *ngIf="activeTab === 'write'">
+         <!-- Toolbar -->
+         <div class="flex flex-wrap gap-1 mb-2 bg-gray-50 dark:bg-gray-700/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
+             <button type="button" (click)="insertMarkdown('bold')" class="p-1 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded" title="Bold">
+                 <b>B</b>
+             </button>
+             <button type="button" (click)="insertMarkdown('italic')" class="p-1 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded" title="Italic">
+                 <i>I</i>
+             </button>
+             <div class="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+             <button type="button" (click)="insertMarkdown('list')" class="p-1 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded" title="List">
+                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+             </button>
+             <button type="button" (click)="insertMarkdown('link')" class="p-1 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded" title="Link">
+                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+             </button>
+             <div class="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+             <button type="button" (click)="insertMarkdown('h1')" class="p-1 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-xs" title="Heading 1">H1</button>
+             <button type="button" (click)="insertMarkdown('h2')" class="p-1 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-xs" title="Heading 2">H2</button>
+             <button type="button" (click)="insertMarkdown('code')" class="p-1 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded" title="Code">
+                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+             </button>
+         </div>
+
+         <textarea 
+            [(ngModel)]="newTask.description" 
+            name="description"
+            rows="5"
+            [disabled]="isSubmitting"
+            placeholder="Add task description... (Markdown supported)"
+            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white disabled:opacity-50 font-mono text-sm"></textarea>
+      </div>
+
+      <!-- Preview Tab -->
+      <div *ngIf="activeTab === 'preview'" class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900 min-h-[150px]">
+          <div class="prose dark:prose-invert max-w-none text-sm">
+             <markdown [data]="newTask.description || '*No description provided*'"></markdown>
+          </div>
+      </div>
     </div>
 
     <!-- Priority & Due Date Row -->
@@ -102,7 +153,7 @@
         </button>
       </div>
 
-      <ul class="space-y-2">
+      <ul class="space-y-2 max-h-40 overflow-y-auto">
         <li *ngFor="let subtask of newTask.subtasks; let i = index" class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
           <span class="text-gray-700 dark:text-gray-300">{{ subtask.title }}</span>
           <button 
@@ -117,7 +168,7 @@
       </ul>
     </div>
 
-    <div class="flex justify-end space-x-3">
+    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
       <button 
         type="button"
         (click)="onCancel()"
@@ -130,8 +181,7 @@
         [disabled]="isSubmitting"
         class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center">
         <span *ngIf="isSubmitting" class="mr-2">...</span>
-        Add Task
+        {{ task ? 'Update Task' : 'Add Task' }}
       </button>
     </div>
   </form>
-</div>

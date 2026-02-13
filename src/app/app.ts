@@ -6,6 +6,7 @@ import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
 import { ToastComponent } from './shared/components/toast/toast.component';
 import { LayoutService } from './core/services/layout.service';
+import { MarkdownService } from 'ngx-markdown';
 import { filter } from 'rxjs';
 
 @Component({
@@ -60,13 +61,20 @@ export class App implements OnInit {
   private auth = inject(Auth);
   private router = inject(Router);
   public layoutService = inject(LayoutService);
+  private markdownService = inject(MarkdownService);
   loading = true;
   showNavbar = false;
   showSidebar = false;
 
   ngOnInit() {
-    // console.log('App initialized');
-    
+    // Configure Markdown Renderer for Links
+    this.markdownService.renderer.link = (token: any) => {
+      const href = token.href;
+      const title = token.title;
+      const text = token.text; 
+      return `<a href="${href}" ${title ? `title="${title}"` : ''} target="_blank" rel="noopener noreferrer">${text}</a>`;
+    };
+
     // Listen to auth state changes
     authState(this.auth).subscribe((user) => {
       this.loading = false;

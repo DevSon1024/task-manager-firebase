@@ -41,3 +41,13 @@ html, body {
 body {
   @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100;
 }
+
+/* Markdown Styles */
+.prose a {
+  color: #2563eb; /* text-blue-600 */
+  text-decoration: underline;
+}
+
+.dark .prose a {
+  color: #60a5fa; /* text-blue-400 */
+}
