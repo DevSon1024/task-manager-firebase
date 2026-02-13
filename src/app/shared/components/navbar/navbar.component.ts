@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserProfileService, UserProfile } from '../../../core/services/user-profile.service';
 import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
+import { LayoutService } from '../../../core/services/layout.service';
 
 @Component({
   selector: 'app-navbar',
@@ -13,6 +14,7 @@ import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent implements OnInit {
+  public layoutService = inject(LayoutService);
   private authService = inject(AuthService);
   private userProfileService = inject(UserProfileService);
   private router = inject(Router);

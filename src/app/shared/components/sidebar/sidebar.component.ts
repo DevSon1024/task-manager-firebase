@@ -1,8 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, NavigationStart } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserProfileService, UserProfile } from '../../../core/services/user-profile.service';
+import { LayoutService } from '../../../core/services/layout.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -19,6 +20,8 @@ import { UserProfileService, UserProfile } from '../../../core/services/user-pro
 export class SidebarComponent implements OnInit {
   private authService = inject(AuthService);
   private userProfileService = inject(UserProfileService);
+  public layoutService = inject(LayoutService);
+  private router = inject(Router);
 
   userProfile: UserProfile | null = null;
   isAdmin = false;
@@ -26,15 +29,22 @@ export class SidebarComponent implements OnInit {
   ngOnInit(): void {
     this.userProfileService.userProfile$.subscribe(profile => {
       this.userProfile = profile;
-      // We need to check the role. The UserProfile model in UserProfileService might not have 'role' typed yet if it's strictly UserProfile interface
-      // But the data from Firestore should contain it.
-      // Let's cast or check safely.
       const profileData = profile as any; 
       this.isAdmin = profileData?.role === 'admin';
+    });
+    
+    // Close sidebar on route change (for mobile)
+    this.router.events.subscribe(() => {
+       this.layoutService.closeSidebar();
     });
   }
 
   async logout() {
     await this.authService.logout();
+    this.close();
+  }
+  
+  close() {
+    this.layoutService.closeSidebar();
   }
 }

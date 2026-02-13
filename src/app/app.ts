@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
 import { ToastComponent } from './shared/components/toast/toast.component';
+import { LayoutService } from './core/services/layout.service';
 import { filter } from 'rxjs';
 
 @Component({
@@ -20,9 +21,18 @@ import { filter } from 'rxjs';
         </div>
       </div>
     } @else {
-      <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
-        <!-- Sidebar (Hidden on mobile by default, handled by CSS/State later if needed, for now desktop visible) -->
-        <app-sidebar *ngIf="showSidebar" class="hidden md:block w-64 flex-shrink-0 h-screen sticky top-0"></app-sidebar>
+      <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex relative">
+        <!-- Mobile Sidebar Overlay -->
+        <div *ngIf="showSidebar && layoutService.isSidebarOpen()" 
+             (click)="layoutService.closeSidebar()"
+             class="fixed inset-0 bg-gray-900/50 z-20 md:hidden transition-opacity"></div>
+
+        <!-- Sidebar -->
+        <!-- Fixed on mobile, Static on desktop. Uses layoutService for mobile toggle. Always visible on desktop via md:translate-x-0 -->
+        <app-sidebar *ngIf="showSidebar" 
+                     class="fixed inset-y-0 left-0 z-30 w-64 transform transition-transform duration-300 md:translate-x-0 md:static md:inset-auto bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"
+                     [class.-translate-x-full]="!layoutService.isSidebarOpen()">
+        </app-sidebar>
         
         <!-- Main Content Area -->
         <div class="flex-1 flex flex-col min-h-screen min-w-0">
@@ -49,6 +59,7 @@ import { filter } from 'rxjs';
 export class App implements OnInit {
   private auth = inject(Auth);
   private router = inject(Router);
+  public layoutService = inject(LayoutService);
   loading = true;
   showNavbar = false;
   showSidebar = false;
