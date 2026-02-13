@@ -30,7 +30,7 @@ import { filter } from 'rxjs';
         <!-- Sidebar -->
         <!-- Fixed on mobile, Static on desktop. Uses layoutService for mobile toggle. Always visible on desktop via md:translate-x-0 -->
         <app-sidebar *ngIf="showSidebar" 
-                     class="fixed inset-y-0 left-0 z-30 w-64 transform transition-transform duration-300 md:translate-x-0 md:static md:inset-auto bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"
+                     class="fixed inset-y-0 left-0 z-30 w-64 transform transition-transform duration-300 md:translate-x-0 md:sticky md:top-0 md:h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"
                      [class.-translate-x-full]="!layoutService.isSidebarOpen()">
         </app-sidebar>
         

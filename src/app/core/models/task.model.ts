@@ -12,4 +12,5 @@ export interface Task {
   tags?: string[];
   subtasks?: { title: string; completed: boolean }[];
   priority?: 'low' | 'medium' | 'high';
+  status?: 'todo' | 'in-progress' | 'done';
 }

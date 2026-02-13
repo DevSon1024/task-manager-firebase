@@ -1,6 +1,8 @@
 import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { FormsModule } from '@angular/forms';
+import { MarkdownModule } from 'ngx-markdown';
 import { Timestamp } from 'firebase/firestore';
 import { Task } from '../../../core/models/task.model';
 import { TaskService } from '../../../core/services/task.service';
@@ -9,7 +11,7 @@ import { ToastService } from '../../../core/services/toast.service';
 @Component({
   selector: 'app-task-item',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MarkdownModule, DragDropModule],
   templateUrl: './task-item.component.html',
   styleUrls: ['./task-item.component.css']
 })

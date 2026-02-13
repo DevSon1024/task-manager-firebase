@@ -150,9 +150,15 @@
         <div class="flex items-center justify-between mb-2">
             <h3 [class.line-through]="task.completed" 
                 [class.text-gray-500]="task.completed"
-                class="text-lg font-semibold text-gray-900 dark:text-white">
+                class="text-lg font-semibold text-gray-900 dark:text-white flex-1 mr-2">
             {{ task.title }}
             </h3>
+            <!-- Drag Handle for Mobile (visible always for better UX, but critical on mobile) -->
+            <div cdkDragHandle class=" cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1">
+                <svg class="h-6 w-6 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </div>
             <!-- Priority Badge (optional, but border covers it mostly. Let's keep it clean) -->
         </div>
 
@@ -164,11 +170,11 @@
             </span>
         </div>
         
-        <p *ngIf="task.description" 
-           [class.line-through]="task.completed"
-           class="text-gray-600 dark:text-gray-400 mb-3 break-words">
-          {{ task.description }}
-        </p>
+        <div *ngIf="task.description" 
+             [class.line-through]="task.completed"
+             class="text-gray-600 dark:text-gray-400 mb-3 break-words prose dark:prose-invert max-w-none text-sm">
+          <markdown [data]="task.description"></markdown>
+        </div>
 
         <!-- Subtasks Display -->
         <div *ngIf="task.subtasks && task.subtasks.length > 0" class="mb-3 space-y-1">
