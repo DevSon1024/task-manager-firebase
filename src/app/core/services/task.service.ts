@@ -38,19 +38,29 @@ export class TaskService {
     return collectionData(tasksQuery, { idField: 'id' }) as Observable<Task[]>;
   }
 
-  // Create new task with optional due date
-  async createTask(title: string, description: string, dueDate: Date | null): Promise<void> {
+  // Create new task with optional due date, tags, subtasks, and priority
+  async createTask(
+    title: string, 
+    description: string, 
+    dueDate: Date | null,
+    tags: string[] = [],
+    subtasks: { title: string; completed: boolean }[] = [],
+    priority: 'low' | 'medium' | 'high' = 'medium'
+  ): Promise<void> {
     const userId = this.authService.getCurrentUser()?.uid;
     if (!userId) throw new Error('User not authenticated');
 
-    const task = {
+    const task: any = {
       title,
       description,
       completed: false,
       dueDate: dueDate ? Timestamp.fromDate(dueDate) : null,
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
-      userId
+      userId,
+      tags,
+      subtasks,
+      priority
     };
 
     await addDoc(this.tasksCollection, task);

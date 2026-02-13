@@ -9,4 +9,7 @@ export interface Task {
   createdAt: Timestamp;
   updatedAt: Timestamp;
   userId: string;
+  tags?: string[];
+  subtasks?: { title: string; completed: boolean }[];
+  priority?: 'low' | 'medium' | 'high';
 }

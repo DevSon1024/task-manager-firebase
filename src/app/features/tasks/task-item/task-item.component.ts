@@ -24,8 +24,14 @@ export class TaskItemComponent {
   editTaskData = {
     title: '',
     description: '',
-    dueDate: ''
+    dueDate: '',
+    tags: [] as string[],
+    subtasks: [] as { title: string; completed: boolean }[],
+    priority: 'medium' as 'low' | 'medium' | 'high'
   };
+
+  availableTags = ['Work', 'Personal', 'Urgent', 'Health', 'Finance'];
+  newSubtaskTitle = '';
 
   startEdit() {
     this.isEditing = true;
@@ -41,8 +47,48 @@ export class TaskItemComponent {
     this.editTaskData = {
       title: this.task.title,
       description: this.task.description,
-      dueDate: dateStr
+      dueDate: dateStr,
+      tags: this.task.tags ? [...this.task.tags] : [],
+      subtasks: this.task.subtasks ? JSON.parse(JSON.stringify(this.task.subtasks)) : [],
+      priority: this.task.priority || 'medium'
     };
+  }
+
+  toggleTag(tag: string) {
+    if (this.editTaskData.tags.includes(tag)) {
+      this.editTaskData.tags = this.editTaskData.tags.filter(t => t !== tag);
+    } else {
+      this.editTaskData.tags.push(tag);
+    }
+  }
+
+  addSubtask() {
+    if (this.newSubtaskTitle.trim()) {
+      this.editTaskData.subtasks.push({ title: this.newSubtaskTitle.trim(), completed: false });
+      this.newSubtaskTitle = '';
+    }
+  }
+
+  removeSubtask(index: number) {
+    this.editTaskData.subtasks.splice(index, 1);
+  }
+
+  async toggleSubtaskCompletion(subtaskIndex: number) {
+    if (!this.task.subtasks) return;
+    
+    // Create a deep copy to modify
+    const updatedSubtasks = JSON.parse(JSON.stringify(this.task.subtasks));
+    updatedSubtasks[subtaskIndex].completed = !updatedSubtasks[subtaskIndex].completed;
+
+    try {
+      await this.taskService.updateTask(this.task.id!, { subtasks: updatedSubtasks });
+      // Optimistically update local state or rely on observable? 
+      // Since it's observable based, it should auto-update, but for better UX on slow networks we might want local update.
+      // For now, let's rely on Firebase realtime updates.
+    } catch (error: any) {
+      console.error('Error toggling subtask:', error);
+      this.toastService.error('Failed to update subtask');
+    }
   }
 
   cancelEdit() {
@@ -59,7 +105,10 @@ export class TaskItemComponent {
       const updates: Partial<Task> = {
         title: this.editTaskData.title,
         description: this.editTaskData.description,
-        dueDate: this.editTaskData.dueDate ? Timestamp.fromDate(new Date(this.editTaskData.dueDate)) : null
+        dueDate: this.editTaskData.dueDate ? Timestamp.fromDate(new Date(this.editTaskData.dueDate)) : null,
+        tags: this.editTaskData.tags,
+        subtasks: this.editTaskData.subtasks,
+        priority: this.editTaskData.priority
       };
 
       await this.taskService.updateTask(this.task.id!, updates);
