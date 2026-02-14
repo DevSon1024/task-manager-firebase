@@ -10,11 +10,13 @@ import { MarkdownService } from 'ngx-markdown';
 import { filter } from 'rxjs';
 import { AuthService } from './core/services/auth.service';
 import { NotificationService } from './core/services/notification.service';
+import { SearchOverlayComponent } from './shared/components/search-overlay/search-overlay.component';
+import { SearchService } from './core/services/search.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, NavbarComponent, SidebarComponent, ToastComponent],
+  imports: [RouterOutlet, CommonModule, NavbarComponent, SidebarComponent, ToastComponent, SearchOverlayComponent],
   template: `
     @if (loading) {
       <div class="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -31,16 +33,15 @@ import { NotificationService } from './core/services/notification.service';
              class="fixed inset-0 bg-gray-900/50 z-20 md:hidden transition-opacity"></div>
 
         <!-- Sidebar -->
-        <!-- Fixed on mobile, Static on desktop. Uses layoutService for mobile toggle. Always visible on desktop via md:translate-x-0 -->
+        <!-- Fixed on mobile, Sticky on desktop -->
         <app-sidebar *ngIf="showSidebar" 
-                     class="fixed inset-y-0 left-0 z-30 w-64 transform transition-transform duration-300 md:translate-x-0 md:sticky md:top-0 md:h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"
+                     class="fixed inset-y-0 left-0 z-30 transform transition-transform duration-300 md:translate-x-0 md:sticky md:top-0 md:h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"
                      [class.-translate-x-full]="!layoutService.isSidebarOpen()">
         </app-sidebar>
         
         <!-- Main Content Area -->
         <div class="flex-1 flex flex-col min-h-screen min-w-0">
-           <!-- Navbar (Optional: remove if sidebar handles everything, or keep for mobile/top actions) -->
-           <!-- Let's keep navbar for mobile and for top-right actions like profile/theme -->
+           <!-- Navbar -->
            <app-navbar *ngIf="showNavbar" class="sticky top-0 z-10"></app-navbar>
 
            <main class="flex-1 overflow-y-auto">
@@ -49,6 +50,12 @@ import { NotificationService } from './core/services/notification.service';
         </div>
         
         <app-toast></app-toast>
+
+        <!-- Global Search Overlay -->
+        <app-search-overlay 
+            *ngIf="searchService.isSearchOpen$ | async" 
+            (close)="searchService.closeSearch()">
+        </app-search-overlay>
       </div>
     }
   `,
@@ -61,11 +68,12 @@ import { NotificationService } from './core/services/notification.service';
 })
 export class App implements OnInit {
   private auth = inject(Auth);
-  private authService = inject(AuthService); // Inject Custom AuthService
+  private authService = inject(AuthService); 
   private router = inject(Router);
   public layoutService = inject(LayoutService);
+  public searchService = inject(SearchService); // Inject SearchService
   private markdownService = inject(MarkdownService);
-  private notificationService = inject(NotificationService); // Start monitoring
+  private notificationService = inject(NotificationService); 
   loading = true;
   showNavbar = false;
   showSidebar = false;

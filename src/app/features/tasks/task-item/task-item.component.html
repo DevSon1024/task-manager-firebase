@@ -5,7 +5,12 @@
   [class.border-l-yellow-500]="!task.completed && (task.priority === 'medium' || !task.priority)"
   [class.border-l-red-500]="!task.completed && task.priority === 'high'"
   [class.border-gray-200]="task.completed"
-  class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 cursor-pointer">
+  [ngClass]="{
+    'bg-white dark:bg-gray-800': !task.status || task.status === 'todo',
+    'bg-blue-50 dark:bg-blue-900/20': task.status === 'in-progress',
+    'bg-green-50 dark:bg-green-900/20': task.status === 'done'
+  }"
+  class="rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 cursor-pointer">
         
   <div class="p-6">
     <div class="flex items-start space-x-4">
@@ -65,13 +70,6 @@
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>
             {{ task.dueDate.toDate() | date:'short' }}
-          </span>
-          
-          <span *ngIf="task.completed" class="flex items-center text-green-600">
-            <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-            </svg>
-            Completed
           </span>
         </div>
       </div>

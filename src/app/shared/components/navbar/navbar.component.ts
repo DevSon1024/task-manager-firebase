@@ -6,6 +6,8 @@ import { UserProfileService, UserProfile } from '../../../core/services/user-pro
 import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 import { LayoutService } from '../../../core/services/layout.service';
 
+import { SearchService } from '../../../core/services/search.service';
+
 @Component({
   selector: 'app-navbar',
   standalone: true,
@@ -17,11 +19,16 @@ export class NavbarComponent implements OnInit {
   public layoutService = inject(LayoutService);
   private authService = inject(AuthService);
   private userProfileService = inject(UserProfileService);
+  private searchService = inject(SearchService);
   private router = inject(Router);
 
   userProfile: UserProfile | null = null;
   greeting: string = '';
   isProfileMenuOpen = false;
+
+  toggleSearch() {
+    this.searchService.toggleSearch();
+  }
 
   ngOnInit(): void {
     this.loadUserData();

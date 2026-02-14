@@ -16,21 +16,24 @@ import {
   DragDropModule 
 } from '@angular/cdk/drag-drop';
 import { ToastService } from '../../../core/services/toast.service';
+import { SearchService } from '../../../core/services/search.service';
 import { MarkdownModule } from 'ngx-markdown';
+import { TaskDetailViewComponent } from '../task-detail-view/task-detail-view.component';
 
 @Component({
   selector: 'app-task-list',
   standalone: true,
-  imports: [CommonModule, TaskFormComponent, TaskItemComponent, LoaderComponent, DragDropModule, ModalComponent, FormsModule, MarkdownModule],
+  imports: [CommonModule, TaskFormComponent, TaskItemComponent, TaskDetailViewComponent, LoaderComponent, DragDropModule, ModalComponent, FormsModule, MarkdownModule],
   templateUrl: './task-list.component.html',
   styleUrls: ['./task-list.component.css']
 })
 export class TaskListComponent implements OnInit {
   private taskService = inject(TaskService);
   private toastService = inject(ToastService);
+  private searchService = inject(SearchService);
 
   tasks$!: Observable<Task[]>;
-  searchTerm$ = new BehaviorSubject<string>('');
+  // searchTerm$ removed in favor of SearchService
   
   todoTasks: Task[] = [];
   inProgressTasks: Task[] = [];
@@ -38,7 +41,7 @@ export class TaskListComponent implements OnInit {
 
   isModalOpen = false;
   editingTask: Task | null = null;
-  searchTerm: string = '';
+  // searchTerm: string = ''; // Removed
 
   // View Mode
   isViewModalOpen = false;
@@ -50,16 +53,27 @@ export class TaskListComponent implements OnInit {
   ngOnInit() {
     this.tasks$ = combineLatest([
       this.taskService.getUserTasks(),
-      this.searchTerm$
+      this.searchService.searchState$
     ]).pipe(
-      map(([tasks, term]) => {
-        if (!term) return tasks;
-        const lowerTerm = term.toLowerCase();
-        return tasks.filter(task => 
-          task.title.toLowerCase().includes(lowerTerm) ||
-          task.description.toLowerCase().includes(lowerTerm) ||
-          task.tags?.some(tag => tag.toLowerCase().includes(lowerTerm))
-        );
+      map(([tasks, filters]) => {
+        // If no filters, return all
+        if (!filters.query && filters.tags.length === 0 && !filters.priority) return tasks;
+
+        const lowerTerm = filters.query.toLowerCase();
+        
+        return tasks.filter(task => {
+          const matchesQuery = !filters.query || 
+            task.title.toLowerCase().includes(lowerTerm) ||
+            task.description.toLowerCase().includes(lowerTerm) ||
+            task.tags?.some(tag => tag.toLowerCase().includes(lowerTerm));
+
+          const matchesTags = filters.tags.length === 0 || 
+            (task.tags && filters.tags.every(t => task.tags?.includes(t)));
+
+          const matchesPriority = !filters.priority || task.priority === filters.priority;
+
+          return matchesQuery && matchesTags && matchesPriority;
+        });
       })
     );
 
@@ -73,9 +87,7 @@ export class TaskListComponent implements OnInit {
     });
   }
 
-  onSearch(term: string) {
-    this.searchTerm$.next(term);
-  }
+
 
   openAddModal() {
     this.editingTask = null;
@@ -102,45 +114,7 @@ export class TaskListComponent implements OnInit {
     this.viewingTask = null;
   }
 
-  async toggleViewTaskComplete(task: Task) {
-    if (!task.id) return;
-    const newCompletedState = !task.completed;
-    
-    // Optimistic update
-    task.completed = newCompletedState;
-    
-    try {
-      await this.taskService.toggleTaskCompletion(task.id, newCompletedState);
-      // Status update logic is handled in service/backend usually, but if we want to reflect it:
-      if (newCompletedState && task.status !== 'done') {
-         // task.status = 'done'; // Optional: let the backend/observable handle this source of truth? 
-         // But if we want immediate feedback in modal, we might need to touch it.
-         // For now, just toggle completion.
-      }
-    } catch (error: any) {
-      console.error('Error toggling task:', error);
-      task.completed = !newCompletedState; // Revert
-      this.toastService.error('Failed to update task');
-    }
-  }
 
-  async toggleViewSubtaskComplete(task: Task, index: number) {
-    if (!task.id || !task.subtasks) return;
-    
-    const subtasks = [...task.subtasks];
-    subtasks[index].completed = !subtasks[index].completed;
-    
-    // Optimistic update for the view
-    task.subtasks[index].completed = subtasks[index].completed;
-
-    try {
-      await this.taskService.updateTask(task.id, { subtasks });
-    } catch (error: any) {
-      console.error('Error updating subtask:', error);
-      task.subtasks[index].completed = !subtasks[index].completed; // Revert
-      this.toastService.error('Failed to update subtask');
-    }
-  }
 
   async drop(event: CdkDragDrop<Task[]>) {
     if (event.previousContainer === event.container) {
