@@ -21,9 +21,14 @@ export class TaskItemComponent {
 
   @Input() task!: Task;
   @Output() edit = new EventEmitter<Task>();
+  @Output() view = new EventEmitter<Task>();
 
   onEdit() {
     this.edit.emit(this.task);
+  }
+
+  onViewTask() {
+    this.view.emit(this.task);
   }
 
   async onToggleComplete(completed: boolean) {

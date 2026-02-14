@@ -41,7 +41,7 @@ export class TaskFormComponent implements OnInit {
       // Populate form with existing task data
       this.newTask = {
         ...this.task,
-        dueDate: this.task.dueDate ? (this.task.dueDate as any).toDate().toISOString().split('T')[0] : ''
+        dueDate: this.task.dueDate ? (this.task.dueDate as any).toDate().toISOString().slice(0, 16) : ''
       };
     }
   }

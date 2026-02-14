@@ -182,7 +182,7 @@ export class AuthService {
     return snapshot.data() as User;
   }
 
-  private async redirectBasedOnRole(uid: string): Promise<void> {
+  public async redirectBasedOnRole(uid: string): Promise<void> {
     const profile = await this.getUserProfile(uid);
     if (profile && profile.role === 'admin') {
       this.router.navigate(['/admin']);

@@ -8,6 +8,8 @@ import { ToastComponent } from './shared/components/toast/toast.component';
 import { LayoutService } from './core/services/layout.service';
 import { MarkdownService } from 'ngx-markdown';
 import { filter } from 'rxjs';
+import { AuthService } from './core/services/auth.service';
+import { NotificationService } from './core/services/notification.service';
 
 @Component({
   selector: 'app-root',
@@ -41,7 +43,7 @@ import { filter } from 'rxjs';
            <!-- Let's keep navbar for mobile and for top-right actions like profile/theme -->
            <app-navbar *ngIf="showNavbar" class="sticky top-0 z-10"></app-navbar>
 
-           <main class="flex-1 overflow-y-auto p-4">
+           <main class="flex-1 overflow-y-auto">
              <router-outlet></router-outlet>
            </main>
         </div>
@@ -59,9 +61,11 @@ import { filter } from 'rxjs';
 })
 export class App implements OnInit {
   private auth = inject(Auth);
+  private authService = inject(AuthService); // Inject Custom AuthService
   private router = inject(Router);
   public layoutService = inject(LayoutService);
   private markdownService = inject(MarkdownService);
+  private notificationService = inject(NotificationService); // Start monitoring
   loading = true;
   showNavbar = false;
   showSidebar = false;
@@ -82,12 +86,10 @@ export class App implements OnInit {
       
       if (user) {
         // console.log('User is logged in:', user.email);
-        // Redirect to tasks if user is already on public pages (Login/Register)
+        // Redirect to tasks if user is already on public pages (Login/Register/Landing)
         const currentPath = this.router.url;
-        if (currentPath === '/login' || currentPath === '/register') {
-          // Verify redirection based on role is handled by auth service during login, 
-          // but for direct access/refresh:
-          // this.router.navigate(['/tasks']); // Let's leave this to AuthGuard or simple tasks for start
+        if (currentPath === '/login' || currentPath === '/register' || currentPath === '/') {
+           this.authService.redirectBasedOnRole(user.uid);
         }
       } else {
         // console.log('No user logged in');

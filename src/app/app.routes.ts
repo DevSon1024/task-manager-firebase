@@ -39,9 +39,20 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
-    loadComponent: () => import('./features/admin/dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+    loadComponent: () => import('./features/admin/layout/admin-layout.component').then(m => m.AdminLayoutComponent),
     canActivate: [authGuard, adminGuard],
-    title: 'Admin Dashboard'
+    children: [
+        {
+            path: '',
+            redirectTo: 'dashboard',
+            pathMatch: 'full'
+        },
+        {
+            path: 'dashboard',
+            loadComponent: () => import('./features/admin/dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+            title: 'User Management'
+        }
+    ]
   },
   {
     path: 'unauthorized',

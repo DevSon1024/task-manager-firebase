@@ -81,6 +81,7 @@ export class TaskService {
   }
 
   async toggleTaskCompletion(taskId: string, completed: boolean): Promise<void> {
-    await this.updateTask(taskId, { completed });
+    const status = completed ? 'done' : 'todo';
+    await this.updateTask(taskId, { completed, status });
   }
 }

@@ -21,10 +21,11 @@ export class SidebarComponent implements OnInit {
   private authService = inject(AuthService);
   private userProfileService = inject(UserProfileService);
   public layoutService = inject(LayoutService);
-  private router = inject(Router);
+  public router = inject(Router);
 
   userProfile: UserProfile | null = null;
   isAdmin = false;
+  isAdminDashboardExpanded = false;
 
   ngOnInit(): void {
     this.userProfileService.userProfile$.subscribe(profile => {
@@ -37,6 +38,10 @@ export class SidebarComponent implements OnInit {
     this.router.events.subscribe(() => {
        this.layoutService.closeSidebar();
     });
+  }
+
+  toggleAdminDashboard() {
+    this.isAdminDashboardExpanded = !this.isAdminDashboardExpanded;
   }
 
   async logout() {

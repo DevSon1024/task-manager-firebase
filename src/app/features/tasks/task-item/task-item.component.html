@@ -1,15 +1,16 @@
 <div 
+  (click)="onViewTask()"
   [class.border-l-4]="!task.completed"
   [class.border-l-green-500]="!task.completed && task.priority === 'low'"
   [class.border-l-yellow-500]="!task.completed && (task.priority === 'medium' || !task.priority)"
   [class.border-l-red-500]="!task.completed && task.priority === 'high'"
   [class.border-gray-200]="task.completed"
-  class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700">
+  class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 cursor-pointer">
         
   <div class="p-6">
     <div class="flex items-start space-x-4">
       <!-- Checkbox -->
-      <div class="pt-1">
+      <div class="pt-1" (click)="$event.stopPropagation()">
         <input 
           type="checkbox" 
           [checked]="task.completed"
@@ -25,13 +26,6 @@
                 class="text-lg font-semibold text-gray-900 dark:text-white flex-1 mr-2">
             {{ task.title }}
             </h3>
-            <!-- Drag Handle for Mobile (visible always for better UX, but critical on mobile) -->
-            <div cdkDragHandle class=" cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1">
-                <svg class="h-6 w-6 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-            </div>
-            <!-- Priority Badge (optional, but border covers it mostly. Let's keep it clean) -->
         </div>
 
         <!-- Tags Display -->
@@ -50,7 +44,7 @@
 
         <!-- Subtasks Display -->
         <div *ngIf="task.subtasks && task.subtasks.length > 0" class="mb-3 space-y-1">
-            <div *ngFor="let subtask of task.subtasks; let i = index" class="flex items-start space-x-2">
+            <div *ngFor="let subtask of task.subtasks; let i = index" class="flex items-start space-x-2" (click)="$event.stopPropagation()">
                 <input 
                     type="checkbox" 
                     [checked]="subtask.completed"
@@ -70,7 +64,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>
-            {{ task.dueDate.toDate() | date:'MMM d, y' }}
+            {{ task.dueDate.toDate() | date:'short' }}
           </span>
           
           <span *ngIf="task.completed" class="flex items-center text-green-600">
@@ -83,7 +77,7 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex space-x-2">
+      <div class="flex space-x-2" (click)="$event.stopPropagation()">
         <button 
           (click)="onEdit()"
           class="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
