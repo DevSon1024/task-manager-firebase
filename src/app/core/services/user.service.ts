@@ -33,6 +33,12 @@ export class UserService {
     await updateDoc(userRef, { role });
   }
 
+  // Suspend or Reactivate a user
+  async toggleUserSuspension(uid: string, isActive: boolean): Promise<void> {
+    const userRef = doc(this.firestore, 'users', uid);
+    await updateDoc(userRef, { isActive });
+  }
+
   // Delete a user from Firestore
   // Note: This does not delete from Authentication. Admin SDK/Cloud Functions needed for that.
   async deleteUser(uid: string): Promise<void> {

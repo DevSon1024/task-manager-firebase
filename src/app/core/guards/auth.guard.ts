@@ -1,17 +1,23 @@
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CanActivateFn } from '@angular/router';
-import { Auth, authState } from '@angular/fire/auth';
+import { AuthService } from '../services/auth.service';
 import { map, take } from 'rxjs/operators';
 
 export const authGuard: CanActivateFn = () => {
-  const auth = inject(Auth);
+  const authService = inject(AuthService);
   const router = inject(Router);
 
-  return authState(auth).pipe(
-    take(1), // Take only the first emission to avoid multiple checks
-    map((user) => {
-      if (user) {
+  // We check userProfile$ instead of just authState.
+  // This ensures we also verify if they are an active (non-suspended) user.
+  return authService.userProfile$.pipe(
+    take(1),
+    map((profile) => {
+      if (profile) {
+        if (profile.isActive === false) {
+          router.navigate(['/']);
+          return false;
+        }
         return true;
       } else {
         router.navigate(['/']);

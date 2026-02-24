@@ -52,6 +52,26 @@ export class AuthService {
         }
       })
     );
+
+    // Auto-logout suspended users in real-time
+    this.userProfile$.subscribe(profile => {
+      if (profile && profile.isActive === false) {
+        if (this.auth.currentUser) {
+          this.logoutSuspendedUser();
+        }
+      }
+    });
+  }
+
+  // Force-logout a suspended user and display an alert
+  private async logoutSuspendedUser(): Promise<void> {
+    try {
+      await signOut(this.auth);
+      this.router.navigate(['/'], { replaceUrl: true });
+      alert('Your account has been suspended by an administrator.');
+    } catch (e) {
+      console.error('Error logging out suspended user:', e);
+    }
   }
 
   // Initialize persistence settings
@@ -74,6 +94,14 @@ export class AuthService {
   async login(email: string, password: string): Promise<void> {
     try {
       const result = await signInWithEmailAndPassword(this.auth, email, password);
+      
+      // Check for active suspension FIRST
+      const profileInfo = await this.getUserProfile(result.user.uid);
+      if (profileInfo && profileInfo.isActive === false) {
+        await signOut(this.auth);
+        throw new Error('Your account is suspended. Please contact the administrator.');
+      }
+
       // Sync user profile on login
       await this.syncUserProfile(result.user);
       await this.updateUserStatus(result.user.uid, true);
@@ -103,6 +131,14 @@ export class AuthService {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(this.auth, provider);
+      
+      // Check for active suspension FIRST
+      const profileInfo = await this.getUserProfile(result.user.uid);
+      if (profileInfo && profileInfo.isActive === false) {
+        await signOut(this.auth);
+        throw new Error('Your account is suspended. Please contact the administrator.');
+      }
+
       await this.syncUserProfile(result.user);
       await this.updateUserStatus(result.user.uid, true);
       
@@ -152,8 +188,9 @@ export class AuthService {
     };
 
     if (!userSnapshot.exists()) {
-      // New user, set default role
+      // New user, set default role & active status
       userData.role = 'user';
+      userData.isActive = true;
       await setDoc(userRef, userData);
     } else {
       // Existing user: check if role exists, if not, set default

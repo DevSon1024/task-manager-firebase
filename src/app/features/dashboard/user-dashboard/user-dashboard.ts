@@ -1,7 +1,7 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { combineLatest } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { TaskService } from '../../../core/services/task.service';
 import { NoteService } from '../../../core/services/note.service';
@@ -26,7 +26,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './user-dashboard.html',
   styleUrl: './user-dashboard.css',
 })
-export class UserDashboard implements OnInit {
+export class UserDashboard implements OnInit, OnDestroy {
   authService = inject(AuthService);
   taskService = inject(TaskService);
   noteService = inject(NoteService);
@@ -46,6 +46,8 @@ export class UserDashboard implements OnInit {
   // Quick Note State
   newQuickNote = '';
 
+  private dashboardSub?: Subscription;
+
   ngOnInit() {
     this.loadDashboardData();
   }
@@ -55,7 +57,7 @@ export class UserDashboard implements OnInit {
     const tasks$ = this.taskService.getUserTasks();
     const notes$ = this.noteService.getUserNotes();
 
-    combineLatest([userProfile$, tasks$, notes$]).subscribe({
+    this.dashboardSub = combineLatest([userProfile$, tasks$, notes$]).subscribe({
       next: ([profile, tasks, notes]) => {
         this.userProfile = profile;
         
@@ -98,6 +100,10 @@ export class UserDashboard implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  ngOnDestroy() {
+    this.dashboardSub?.unsubscribe();
   }
 
   async quickCompleteTask(task: Task, event: Event) {

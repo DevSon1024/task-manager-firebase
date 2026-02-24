@@ -1,6 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Task } from '../../../core/models/task.model';
 import { TaskService } from '../../../core/services/task.service';
@@ -27,12 +27,13 @@ import { TaskDetailViewComponent } from '../task-detail-view/task-detail-view.co
   templateUrl: './task-list.component.html',
   styleUrls: ['./task-list.component.css']
 })
-export class TaskListComponent implements OnInit {
+export class TaskListComponent implements OnInit, OnDestroy {
   private taskService = inject(TaskService);
   private toastService = inject(ToastService);
   private searchService = inject(SearchService);
 
   tasks$!: Observable<Task[]>;
+  private tasksSub?: Subscription;
   // searchTerm$ removed in favor of SearchService
   
   todoTasks: Task[] = [];
@@ -77,7 +78,7 @@ export class TaskListComponent implements OnInit {
       })
     );
 
-    this.tasks$.subscribe(tasks => {
+    this.tasksSub = this.tasks$.subscribe(tasks => {
       this.todoTasks = tasks.filter(t => !t.status || t.status === 'todo');
       this.inProgressTasks = tasks.filter(t => t.status === 'in-progress');
       this.doneTasks = tasks.filter(t => t.status === 'done');
@@ -85,6 +86,10 @@ export class TaskListComponent implements OnInit {
       // Sort each column by date descending (optional, but good for UX)
       // Note: original query sorts by createdAt desc. 
     });
+  }
+
+  ngOnDestroy() {
+    this.tasksSub?.unsubscribe();
   }
 
 

@@ -6,4 +6,5 @@ export interface User {
   role?: 'admin' | 'user'; // Default 'user'
   lastSeen?: any; // Firestore Timestamp
   isOnline?: boolean;
+  isActive?: boolean; // false if suspended
 }
