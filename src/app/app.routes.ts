@@ -26,6 +26,12 @@ export const routes: Routes = [
     title: 'My Tasks'
   },
   {
+    path: 'notes',
+    loadComponent: () => import('./features/notes/notes.component').then(m => m.NotesComponent),
+    canActivate: [authGuard],
+    title: 'Notes - TaskFlow'
+  },
+  {
     path: 'profile',
     loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent),
     canActivate: [authGuard],

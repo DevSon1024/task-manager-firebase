@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router, NavigationStart } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserProfileService, UserProfile } from '../../../core/services/user-profile.service';
 import { LayoutService } from '../../../core/services/layout.service';
@@ -13,7 +13,7 @@ import { LayoutService } from '../../../core/services/layout.service';
   styles: [`
     :host {
       display: block;
-      height: 100%;
+      height: 100vh;
     }
   `]
 })
@@ -38,6 +38,11 @@ export class SidebarComponent implements OnInit {
     this.router.events.subscribe(() => {
        this.layoutService.closeSidebar();
     });
+  }
+
+  openCreateTask(): void {
+    this.layoutService.openGlobalCreateTask();
+    this.layoutService.closeSidebar(); // close on mobile
   }
 
   toggleAdminDashboard() {

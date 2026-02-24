@@ -1,0 +1,79 @@
+/* Slide-in animation for the editor panel */
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Note card hover */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Markdown preview inside editor */
+.prose {
+  color: inherit;
+}
+
+.prose h1, .prose h2, .prose h3 {
+  margin-top: 0.75em;
+  margin-bottom: 0.25em;
+}
+
+.prose pre {
+  background: #1e293b;
+  color: #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.prose code {
+  background: #f1f5f9;
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.25rem;
+  font-size: 0.85em;
+}
+
+.dark .prose code {
+  background: #334155;
+}
+
+/* Textarea custom scrollbar */
+.note-editor-textarea::-webkit-scrollbar {
+  width: 6px;
+}
+
+.note-editor-textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.note-editor-textarea::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 3px;
+}
+
+.dark .note-editor-textarea::-webkit-scrollbar-thumb {
+  background: #4a5568;
+}

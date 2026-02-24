@@ -1,0 +1,329 @@
+<div class="flex h-full min-h-screen bg-gray-50 dark:bg-gray-900">
+
+  <!-- ===================== LEFT SIDEBAR: Categories ===================== -->
+  <aside class="hidden md:flex flex-col w-60 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shrink-0">
+    <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+      <h2 class="text-lg font-bold text-gray-900 dark:text-white">Notebooks</h2>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto p-3 space-y-1">
+      <!-- All Notes -->
+      <button 
+        (click)="selectCategory('All Notes')"
+        [class.bg-blue-50]="selectedCategory === 'All Notes'"
+        [class.dark:bg-gray-700]="selectedCategory === 'All Notes'"
+        [class.text-blue-600]="selectedCategory === 'All Notes'"
+        [class.dark:text-blue-400]="selectedCategory === 'All Notes'"
+        class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left">
+        <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+        </svg>
+        All Notes
+        <span class="ml-auto text-xs bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-400 rounded-full px-2 py-0.5">{{ notes.length }}</span>
+      </button>
+
+      <!-- Divider -->
+      <div class="pt-2 pb-1">
+        <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider px-3">Categories</p>
+      </div>
+
+      <!-- Category Buttons -->
+      <button *ngFor="let cat of categories"
+        (click)="selectCategory(cat)"
+        [class.bg-blue-50]="selectedCategory === cat"
+        [class.dark:bg-gray-700]="selectedCategory === cat"
+        [class.text-blue-600]="selectedCategory === cat"
+        [class.dark:text-blue-400]="selectedCategory === cat"
+        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left">
+        <svg class="h-4 w-4 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+        </svg>
+        <span class="truncate">{{ cat }}</span>
+        <span class="ml-auto text-xs text-gray-400">{{ countInCategory(cat) }}</span>
+      </button>
+    </nav>
+
+    <!-- New Note Button at bottom of sidebar -->
+    <div class="p-3 border-t border-gray-200 dark:border-gray-700">
+      <button 
+        (click)="openNewNote()"
+        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        New Note
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN CONTENT ===================== -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+
+    <!-- Top Bar -->
+    <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center gap-4 shrink-0">
+      <div class="flex-1">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+          {{ selectedCategory }}
+          <span class="text-base font-normal text-gray-400 ml-2">({{ filteredNotes.length }})</span>
+        </h1>
+      </div>
+
+      <!-- Search -->
+      <div class="relative">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery" 
+          (ngModelChange)="applyFilters()"
+          placeholder="Search notes..."
+          class="pl-9 pr-4 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 w-56">
+      </div>
+
+      <!-- Mobile New Note Button -->
+      <button 
+        (click)="openNewNote()"
+        class="md:hidden flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        New Note
+      </button>
+    </div>
+
+    <!-- Notes Grid -->
+    <div class="flex-1 overflow-y-auto p-6">
+      <!-- Empty State -->
+      <div *ngIf="filteredNotes.length === 0" class="flex flex-col items-center justify-center h-full text-center py-20">
+        <div class="w-20 h-20 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mb-4">
+          <svg class="h-10 w-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">No notes yet</h3>
+        <p class="text-gray-500 dark:text-gray-400 mb-6 max-w-xs">Start capturing your thoughts, ideas and research in rich Markdown notes.</p>
+        <button 
+          (click)="openNewNote()"
+          class="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Create your first note
+        </button>
+      </div>
+
+      <!-- Notes Grid -->
+      <div *ngIf="filteredNotes.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div *ngFor="let note of filteredNotes"
+          (click)="openEditNote(note)"
+          [class]="'group relative rounded-xl border p-4 cursor-pointer hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 ' + getCardColorClass(note.color)">
+          
+          <!-- Card Header -->
+          <div class="flex items-start justify-between mb-2">
+            <h3 class="font-semibold text-gray-900 dark:text-white text-sm line-clamp-1 flex-1 pr-2">{{ note.title }}</h3>
+            <button 
+              (click)="deleteNote(note, $event)"
+              class="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 shrink-0">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Content preview -->
+          <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-3 mb-3 leading-relaxed">{{ note.content }}</p>
+
+          <!-- Task Link Badge -->
+          <div *ngIf="note.taskId" class="flex items-center gap-1 mb-2">
+            <svg class="h-3.5 w-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+            <span class="text-xs text-blue-600 dark:text-blue-400 truncate">{{ getLinkedTaskTitle(note.taskId) }}</span>
+          </div>
+
+          <!-- Tags -->
+          <div *ngIf="note.tags && note.tags.length" class="flex flex-wrap gap-1 mb-3">
+            <span *ngFor="let tag of note.tags.slice(0, 3)" class="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full px-2 py-0.5">
+              #{{ tag }}
+            </span>
+            <span *ngIf="note.tags.length > 3" class="text-xs text-gray-400">+{{ note.tags.length - 3 }}</span>
+          </div>
+
+          <!-- Footer -->
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-gray-400">{{ formatDate(note.updatedAt) }}</span>
+            <span class="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-full px-2 py-0.5">{{ note.category }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== EDITOR PANEL (Slide-over) ===================== -->
+<div *ngIf="isEditorOpen" class="fixed inset-0 z-50 flex">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="closeEditor()"></div>
+
+  <!-- Panel -->
+  <div class="relative ml-auto w-full max-w-3xl bg-white dark:bg-gray-900 shadow-2xl flex flex-col h-full animate-slide-in">
+
+    <!-- Panel Header -->
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 shrink-0">
+      <div class="flex items-center gap-3">
+        <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+        </svg>
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+          {{ isNewNote ? 'New Note' : 'Edit Note' }}
+        </h2>
+      </div>
+      <div class="flex items-center gap-2">
+        <button 
+          (click)="saveNote()" 
+          [disabled]="isSubmitting"
+          class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors">
+          <svg *ngIf="isSubmitting" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          {{ isSubmitting ? 'Saving...' : 'Save Note' }}
+        </button>
+        <button (click)="closeEditor()" class="p-2 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Form Body -->
+    <div class="flex-1 overflow-y-auto">
+
+      <!-- Title & Meta -->
+      <div class="px-6 py-4 space-y-4 border-b border-gray-100 dark:border-gray-800">
+        <!-- Title -->
+        <input 
+          type="text" 
+          [(ngModel)]="noteForm.title" 
+          placeholder="Note title..."
+          class="w-full text-2xl font-bold bg-transparent border-none outline-none text-gray-900 dark:text-white placeholder-gray-300 dark:placeholder-gray-600">
+
+        <!-- Meta row: category, task link, color -->
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Category -->
+          <div class="flex items-center gap-2">
+            <svg class="h-4 w-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+            </svg>
+            <input 
+              type="text" 
+              [(ngModel)]="noteForm.category" 
+              placeholder="Category / Notebook"
+              class="text-sm border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 w-40">
+          </div>
+
+          <!-- Link to Task -->
+          <div class="flex items-center gap-2">
+            <svg class="h-4 w-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+            <select 
+              [(ngModel)]="noteForm.taskId"
+              class="text-sm border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 max-w-[200px]">
+              <option [value]="null">No linked task</option>
+              <option *ngFor="let task of tasks" [value]="task.id">{{ task.title }}</option>
+            </select>
+          </div>
+
+          <!-- Color Picker -->
+          <div class="flex items-center gap-1.5">
+            <button 
+              *ngFor="let c of availableColors"
+              (click)="noteForm.color = c.value"
+              [title]="c.label"
+              [class]="'w-5 h-5 rounded-full border-2 transition-transform hover:scale-110 ' + getColorPickerClass(c.value) + (noteForm.color === c.value ? ' border-blue-500 scale-110' : ' border-transparent')">
+            </button>
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="flex flex-wrap items-center gap-2">
+          <span *ngFor="let tag of noteForm.tags" 
+                class="inline-flex items-center gap-1 text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full px-2.5 py-1">
+            #{{ tag }}
+            <button (click)="removeTag(tag)" class="hover:text-red-500 transition-colors">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </span>
+          <div class="flex items-center gap-1">
+            <input 
+              type="text" 
+              [(ngModel)]="newTagInput" 
+              (keydown.enter)="addTag()"
+              placeholder="Add tag..."
+              class="text-xs border border-dashed border-gray-300 dark:border-gray-600 rounded-full px-3 py-1 bg-transparent text-gray-600 dark:text-gray-400 focus:outline-none focus:border-blue-400 w-24">
+            <button (click)="addTag()" class="text-blue-500 hover:text-blue-700 text-xs font-medium">+ Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Markdown Editor -->
+      <div class="flex flex-col flex-1 px-6 py-4">
+        <!-- Tabs -->
+        <div class="flex items-center gap-1 mb-3">
+          <button 
+            (click)="activeEditorTab = 'write'"
+            [class.bg-blue-600]="activeEditorTab === 'write'"
+            [class.text-white]="activeEditorTab === 'write'"
+            [class.text-gray-600]="activeEditorTab !== 'write'"
+            [class.dark:text-gray-300]="activeEditorTab !== 'write'"
+            class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors">
+            Write
+          </button>
+          <button 
+            (click)="activeEditorTab = 'preview'"
+            [class.bg-blue-600]="activeEditorTab === 'preview'"
+            [class.text-white]="activeEditorTab === 'preview'"
+            [class.text-gray-600]="activeEditorTab !== 'preview'"
+            [class.dark:text-gray-300]="activeEditorTab !== 'preview'"
+            class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors">
+            Preview
+          </button>
+
+          <!-- Markdown Toolbar -->
+          <div *ngIf="activeEditorTab === 'write'" class="ml-auto flex items-center gap-0.5 flex-wrap">
+            <button *ngFor="let btn of [
+              {type:'h1', label:'H1'}, {type:'h2', label:'H2'}, {type:'h3', label:'H3'},
+              {type:'bold', label:'B'}, {type:'italic', label:'I'},
+              {type:'list', label:'•'}, {type:'checklist', label:'☑'},
+              {type:'link', label:'🔗'}, {type:'code', label:'</>'},
+              {type:'codeblock', label:'```'}, {type:'quote', label:'❝'}, {type:'hr', label:'—'}
+            ]"
+              (click)="insertMarkdown(btn.type)"
+              [title]="btn.type"
+              class="px-2 py-1 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors">
+              {{ btn.label }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Write Tab -->
+        <textarea *ngIf="activeEditorTab === 'write'"
+          [(ngModel)]="noteForm.content"
+          placeholder="Write your note in Markdown...&#10;&#10;## Heading&#10;**bold**, *italic*, [link](url)&#10;- List item&#10;- [ ] Todo item&#10;&#10;```code block```"
+          class="note-editor-textarea w-full min-h-[400px] resize-none bg-transparent border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-sm font-mono text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-300 dark:placeholder-gray-600 leading-relaxed">
+        </textarea>
+
+        <!-- Preview Tab -->
+        <div *ngIf="activeEditorTab === 'preview'"
+          class="min-h-[400px] border border-gray-200 dark:border-gray-700 rounded-lg p-4 prose dark:prose-invert prose-sm max-w-none overflow-auto">
+          <markdown [data]="noteForm.content || '*No content yet*'"></markdown>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
