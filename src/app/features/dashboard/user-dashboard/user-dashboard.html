@@ -1,0 +1,199 @@
+<!-- Loading State -->
+<div *ngIf="isLoading" class="flex justify-center items-center h-64">
+  <app-loader></app-loader>
+</div>
+
+<!-- Dashboard Content -->
+<div *ngIf="!isLoading && userProfile" class="container mx-auto px-4 py-8">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+    <!-- Welcome Banner (Full Width) -->
+    <div class="col-span-full bg-blue-600 dark:bg-blue-800 rounded-lg shadow-lg p-6 text-white flex flex-col sm:flex-row justify-between items-center transition-all duration-300 hover:shadow-xl">
+      <div class="mb-4 sm:mb-0">
+        <h1 class="text-2xl md:text-3xl font-bold mb-2">Good morning, {{ userProfile.displayName || 'User' }}!</h1>
+        <p class="text-blue-100">You have {{ taskStats.pending + taskStats.inProgress }} tasks due or in progress.</p>
+      </div>
+      <button 
+        (click)="openCreateTaskModal()"
+        class="bg-white text-blue-600 hover:bg-blue-50 font-semibold py-2 px-6 rounded-lg shadow transition-colors duration-200 flex items-center gap-2 transform hover:scale-105"
+      >
+        <svg xmlns="http://www.w3.org/-2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+        Create New Task
+      </button>
+    </div>
+
+    <!-- Task Overview -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 flex flex-col h-full hover:shadow-md transition-shadow">
+      <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/-2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+          <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+        </svg>
+        Task Overview
+      </h2>
+      <div class="flex-1 flex flex-col justify-center space-y-4">
+        <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+          <span class="text-gray-600 dark:text-gray-300 font-medium">Pending</span>
+          <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1 rounded-full dark:bg-yellow-900 dark:text-yellow-300">{{ taskStats.pending }}</span>
+        </div>
+        <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+          <span class="text-gray-600 dark:text-gray-300 font-medium">In Progress</span>
+          <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full dark:bg-blue-900 dark:text-blue-300">{{ taskStats.inProgress }}</span>
+        </div>
+        <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+          <span class="text-gray-600 dark:text-gray-300 font-medium">Completed</span>
+          <span class="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full dark:bg-green-900 dark:text-green-300">{{ taskStats.completed }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Urgent Tasks List (Could span 2 cols on lg screens if we want, but keeping 1 for balance) -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 hover:shadow-md transition-shadow lg:col-span-2">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/-2000/svg" class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+          </svg>
+          Urgent & Upcoming
+        </h2>
+        <a routerLink="/tasks" class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">View All &rarr;</a>
+      </div>
+      
+      <div class="space-y-3">
+        <div *ngIf="urgentTasks.length === 0" class="text-center py-6 text-gray-500 dark:text-gray-400">
+          No urgent tasks at the moment. You're all caught up!
+        </div>
+        
+        <div *ngFor="let task of urgentTasks" 
+             class="flex items-start gap-3 p-3 border border-gray-100 dark:border-gray-700 rounded-lg bg-gray-50 hover:bg-white dark:bg-gray-750 dark:hover:bg-gray-700 transition-colors group">
+          <div class="pt-1 flex-shrink-0">
+            <input 
+              type="checkbox" 
+              class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 cursor-pointer"
+              (click)="quickCompleteTask(task, $event)"
+            >
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate" [class.line-through]="task.completed">{{ task.title }}</h3>
+            <div class="flex flex-wrap gap-2 mt-1">
+              <span *ngIf="task.dueDate" class="inline-flex items-center text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-2 rounded-full">
+                By {{ ($any(task.dueDate).toMillis() | date:'MMM d, y') || 'No Date' }}
+              </span>
+              <span *ngIf="task.priority" 
+                    [ngClass]="{
+                      'text-red-700 bg-red-100 dark:bg-red-900/50 dark:text-red-300': task.priority === 'high',
+                      'text-yellow-700 bg-yellow-100 dark:bg-yellow-900/50 dark:text-yellow-300': task.priority === 'medium',
+                      'text-green-700 bg-green-100 dark:bg-green-900/50 dark:text-green-300': task.priority === 'low'
+                    }"
+                    class="inline-flex items-center text-xs px-2 rounded-full font-medium capitalize">
+                {{ task.priority }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Notes -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 lg:col-span-2 hover:shadow-md transition-shadow flex flex-col">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/-2000/svg" class="h-5 w-5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+            <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+          </svg>
+          Recent Notes
+        </h2>
+        <a routerLink="/notes" class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">All Notes &rarr;</a>
+      </div>
+      
+      <!-- Quick Note Input -->
+      <div class="mb-4">
+        <div class="relative flex items-center">
+          <input 
+            type="text" 
+            [(ngModel)]="newQuickNote"
+            (keyup.enter)="addQuickNote()"
+            placeholder="Type a quick note and press Enter..." 
+            class="w-full pl-4 pr-20 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+          >
+          <button 
+            (click)="addQuickNote()"
+            [disabled]="!newQuickNote.trim()"
+            class="absolute right-1 px-3 py-1 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+
+      <!-- Notes List -->
+      <div class="flex-1 space-y-3 overflow-y-auto">
+        <div *ngIf="recentNotes.length === 0" class="text-center py-6 text-gray-500 dark:text-gray-400">
+          No recent notes.
+        </div>
+        
+        <div *ngFor="let note of recentNotes" class="p-3 border-l-4 border-yellow-400 bg-yellow-50 dark:bg-gray-700 dark:border-yellow-500 rounded-r-lg group hover:bg-yellow-100 dark:hover:bg-gray-600 transition-colors">
+          <h3 class="font-semibold text-gray-800 dark:text-white text-sm mb-1 truncate">{{ note.title || 'Untitled Note' }}</h3>
+          <p class="text-xs text-gray-600 dark:text-gray-300 line-clamp-2">{{ note.content }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 flex flex-col hover:shadow-md transition-shadow">
+      <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/-2000/svg" class="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
+        </svg>
+        Quick Actions
+      </h2>
+      
+      <div class="grid grid-cols-2 gap-3 flex-1">
+        <a routerLink="/tasks" class="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/30 text-gray-700 dark:text-gray-300 transition-colors group">
+          <svg xmlns="http://www.w3.org/-2000/svg" class="h-8 w-8 mb-2 text-blue-500 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          <span class="text-sm font-medium">All Tasks</span>
+        </a>
+        
+        <a routerLink="/notes" class="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-yellow-50 hover:text-yellow-600 dark:hover:bg-yellow-900/30 text-gray-700 dark:text-gray-300 transition-colors group">
+          <svg xmlns="http://www.w3.org/-2000/svg" class="h-8 w-8 mb-2 text-yellow-500 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          <span class="text-sm font-medium">Notebooks</span>
+        </a>
+        
+        <a routerLink="/profile" class="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-purple-50 hover:text-purple-600 dark:hover:bg-purple-900/30 text-gray-700 dark:text-gray-300 transition-colors group">
+          <svg xmlns="http://www.w3.org/-2000/svg" class="h-8 w-8 mb-2 text-purple-500 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <span class="text-sm font-medium">Profile</span>
+        </a>
+        
+        <a routerLink="/settings" class="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-colors group">
+          <svg xmlns="http://www.w3.org/-2000/svg" class="h-8 w-8 mb-2 text-gray-500 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span class="text-sm font-medium">Settings</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Task Form Modal -->
+<app-modal
+  [isOpen]="isTaskModalOpen"
+  title="Create New Task"
+  (close)="closeCreateTaskModal()">
+  
+  <app-task-form 
+    (cancel)="closeCreateTaskModal()"
+  ></app-task-form>
+  
+</app-modal>

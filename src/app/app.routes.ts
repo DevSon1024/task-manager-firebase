@@ -20,6 +20,12 @@ export const routes: Routes = [
     title: 'Register - TaskFlow'
   },
   {
+    path: 'dashboard',
+    loadComponent: () => import('./features/dashboard/user-dashboard/user-dashboard').then(m => m.UserDashboard),
+    canActivate: [authGuard],
+    title: 'Dashboard - TaskFlow'
+  },
+  {
     path: 'tasks',
     loadComponent: () => import('./features/tasks/task-list/task-list.component').then(m => m.TaskListComponent),
     canActivate: [authGuard],

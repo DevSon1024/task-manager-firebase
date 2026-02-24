@@ -91,8 +91,8 @@ export class AuthService {
       const result = await createUserWithEmailAndPassword(this.auth, email, password);
       await this.syncUserProfile(result.user);
       await this.updateUserStatus(result.user.uid, true);
-      // New users are always 'user' role initially, so /tasks is fine, but let's use the helper
-      this.router.navigate(['/tasks']);
+      // New users are always 'user' role initially, so /dashboard is fine, but let's use the helper
+      this.router.navigate(['/dashboard']);
     } catch (error: any) {
       throw new Error(error.message);
     }
@@ -187,7 +187,7 @@ export class AuthService {
     if (profile && profile.role === 'admin') {
       this.router.navigate(['/admin']);
     } else {
-      this.router.navigate(['/tasks']);
+      this.router.navigate(['/dashboard']);
     }
   }
 }
