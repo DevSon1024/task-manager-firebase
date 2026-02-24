@@ -28,7 +28,7 @@ import { TaskFormComponent } from './features/tasks/task-form/task-form.componen
         </div>
       </div>
     } @else {
-      <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex relative">
+      <div [ngClass]="showSidebar ? 'h-screen overflow-hidden' : 'min-h-screen'" class="bg-gray-50 dark:bg-gray-900 flex relative">
         <!-- Mobile Sidebar Overlay -->
         <div *ngIf="showSidebar && layoutService.isSidebarOpen()" 
              (click)="layoutService.closeSidebar()"
@@ -40,12 +40,19 @@ import { TaskFormComponent } from './features/tasks/task-form/task-form.componen
                      [class.-translate-x-full]="!layoutService.isSidebarOpen()">
         </app-sidebar>
         
-        <!-- Main Content Area: offset on desktop to account for sidebar width -->
-        <div class="flex-1 flex flex-col min-h-screen min-w-0 md:ml-20">
-           <!-- Navbar: sticky within this column -->
-           <app-navbar *ngIf="showNavbar" class="sticky top-0 z-10"></app-navbar>
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col h-full min-w-0" [ngClass]="showSidebar ? 'md:ml-20' : ''">
+           <!-- Navbar: collapses height (not transform) to avoid content crop -->
+           <div class="shrink-0 overflow-hidden transition-[max-height] duration-300 ease-in-out"
+                [style.max-height]="showNavbar ? (layoutService.isNavbarHidden() ? '0px' : '80px') : '0px'">
+             <app-navbar *ngIf="showNavbar"></app-navbar>
+           </div>
 
-           <main #mainContent class="flex-1 overflow-y-auto" (scroll)="onMainScroll($event)">
+           <main #mainContent
+                 class="flex-1 overflow-y-auto min-h-0 transition-[filter] duration-300"
+                 [class.blur-sm]="searchService.isSearchOpen$ | async"
+                 [class.brightness-75]="searchService.isSearchOpen$ | async"
+                 (scroll)="onMainScroll($event)">
              <router-outlet></router-outlet>
            </main>
         </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
@@ -18,12 +18,23 @@ export class NavbarComponent implements OnInit, OnDestroy {
   public layoutService = inject(LayoutService);
   private authService = inject(AuthService);
   private userProfileService = inject(UserProfileService);
-  private searchService = inject(SearchService);
+  public searchService = inject(SearchService);
   private router = inject(Router);
 
   userProfile: UserProfile | null = null;
   greeting: string = '';
   isProfileMenuOpen = false;
+
+  // Open search with '/' keyboard shortcut
+  @HostListener('document:keydown', ['$event'])
+  onKeydown(event: KeyboardEvent): void {
+    const tag = (event.target as HTMLElement)?.tagName?.toLowerCase();
+    const isTyping = tag === 'input' || tag === 'textarea' || tag === 'select';
+    if (event.key === '/' && !isTyping) {
+      event.preventDefault();
+      this.searchService.openSearch();
+    }
+  }
 
   toggleSearch() {
     this.searchService.toggleSearch();
