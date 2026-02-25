@@ -10,7 +10,7 @@
     <!-- Welcome Banner (Full Width) -->
     <div class="col-span-full bg-blue-600 dark:bg-blue-800 rounded-lg shadow-lg p-6 text-white flex flex-col sm:flex-row justify-between items-center transition-all duration-300 hover:shadow-xl">
       <div class="mb-4 sm:mb-0">
-        <h1 class="text-2xl md:text-3xl font-bold mb-2">Good morning, {{ userProfile.displayName || 'User' }}!</h1>
+        <h1 class="text-2xl md:text-3xl font-bold mb-2">{{ getGreeting() }}, {{ userProfile.displayName || 'User' }}!</h1>
         <p class="text-blue-100">You have {{ taskStats.pending + taskStats.inProgress }} tasks due or in progress.</p>
       </div>
       <button 
@@ -79,7 +79,7 @@
             <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate" [class.line-through]="task.completed">{{ task.title }}</h3>
             <div class="flex flex-wrap gap-2 mt-1">
               <span *ngIf="task.dueDate" class="inline-flex items-center text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-2 rounded-full">
-                By {{ ($any(task.dueDate).toMillis() | date:'MMM d, y') || 'No Date' }}
+                By {{ ($any(task.dueDate).toMillis() | date:'dd/MM/yyyy h:mm a') || 'No Date' }}
               </span>
               <span *ngIf="task.priority" 
                     [ngClass]="{

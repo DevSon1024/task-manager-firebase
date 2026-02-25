@@ -30,6 +30,8 @@ export class TaskFormComponent implements OnInit {
     priority: 'medium' as 'low' | 'medium' | 'high'
   };
 
+  isDefaultDueDate = false;
+
   // UI State
   activeTab: 'write' | 'preview' = 'write';
   availableTags = ['Work', 'Personal', 'Urgent', 'Health', 'Finance'];
@@ -41,13 +43,19 @@ export class TaskFormComponent implements OnInit {
       // Populate form with existing task data
       this.newTask = {
         ...this.task,
-        dueDate: this.task.dueDate ? (this.task.dueDate as any).toDate().toISOString().slice(0, 16) : ''
+        dueDate: this.task.dueDate ? this.toLocalDateTimeString((this.task.dueDate as any).toDate()) : ''
       };
     }
   }
 
   ngOnInit() {
-    // Initial setup if needed
+    if (!this.task) {
+      // Set default due date to 24 hours from now for new tasks
+      const defaultDate = new Date();
+      defaultDate.setHours(defaultDate.getHours() + 24);
+      this.newTask.dueDate = this.toLocalDateTimeString(defaultDate);
+      this.isDefaultDueDate = true;
+    }
   }
 
   toggleTag(tag: string) {
@@ -154,6 +162,15 @@ export class TaskFormComponent implements OnInit {
         priority: 'medium'
       };
       this.activeTab = 'write';
+  }
+
+  private toLocalDateTimeString(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
   }
 
   onCancel() {

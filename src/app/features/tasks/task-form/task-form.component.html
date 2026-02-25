@@ -105,7 +105,9 @@
           name="dueDate"
           type="datetime-local"
           [disabled]="isSubmitting"
+          (input)="isDefaultDueDate = false"
           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white disabled:opacity-50">
+        <p *ngIf="isDefaultDueDate" class="mt-1 text-xs text-gray-400 dark:text-gray-500 italic">Default time is 24 hours from now</p>
       </div>
     </div>
 

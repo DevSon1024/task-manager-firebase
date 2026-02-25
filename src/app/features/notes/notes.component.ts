@@ -14,7 +14,8 @@ import { Subscription } from 'rxjs';
   standalone: true,
   imports: [CommonModule, FormsModule, MarkdownModule],
   templateUrl: './notes.component.html',
-  styleUrls: ['./notes.component.css']
+  styleUrls: ['./notes.component.css'],
+  host: { style: 'display: block; height: 100%;' }
 })
 export class NotesComponent implements OnInit, OnDestroy {
   private noteService = inject(NoteService);
@@ -233,7 +234,10 @@ export class NotesComponent implements OnInit, OnDestroy {
   formatDate(ts: any): string {
     if (!ts) return '';
     const d = ts.toDate ? ts.toDate() : new Date(ts);
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
   }
 
   getLinkedTaskTitle(taskId?: string | null): string {

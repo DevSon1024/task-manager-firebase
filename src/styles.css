@@ -31,11 +31,16 @@
   @apply bg-gray-400 dark:bg-gray-500;
 }
 
-/* Ensure body takes full height */
+/* Ensure body takes full height and prevents body-level scroll (app uses its own scroll container) */
 html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+}
+
+/* When authenticated layout is active, prevent body scroll to avoid screenshot duplication */
+html:has(app-sidebar) {
+  overflow: hidden;
 }
 
 body {

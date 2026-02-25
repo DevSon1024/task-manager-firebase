@@ -64,7 +64,7 @@ import { Subscription } from 'rxjs';
       <div class="grid grid-cols-2 gap-4 text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-4">
           <div>
             <span class="block text-xs font-bold uppercase text-gray-400">Due Date</span>
-            <span>{{ task.dueDate ? (task.dueDate.toDate() | date:'medium') : 'No date' }}</span>
+            <span>{{ task.dueDate ? (task.dueDate.toDate() | date:'dd/MM/yyyy h:mm a') : 'No date' }}</span>
           </div>
           <div>
             <span class="block text-xs font-bold uppercase text-gray-400">Priority</span>

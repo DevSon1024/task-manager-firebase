@@ -36,7 +36,7 @@ import { TaskFormComponent } from './features/tasks/task-form/task-form.componen
 
         <!-- Sidebar: fixed on mobile, fixed full-height on desktop -->
         <app-sidebar *ngIf="showSidebar" 
-                     class="fixed inset-y-0 left-0 z-30 transform transition-transform duration-300 md:translate-x-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"
+                     class="fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 md:translate-x-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"
                      [class.-translate-x-full]="!layoutService.isSidebarOpen()">
         </app-sidebar>
         
