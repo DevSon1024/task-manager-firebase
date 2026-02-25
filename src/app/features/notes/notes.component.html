@@ -2,8 +2,16 @@
 
   <!-- ===================== LEFT SIDEBAR: Categories ===================== -->
   <aside class="hidden md:flex flex-col w-60 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shrink-0">
-    <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+    <div class="p-4 border-b border-gray-200 dark:border-gray-700 space-y-3">
       <h2 class="text-lg font-bold text-gray-900 dark:text-white">Notebooks</h2>
+      <button 
+        (click)="openNewNote()"
+        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        New Note
+      </button>
     </div>
 
     <nav class="flex-1 overflow-y-auto p-3 space-y-1">
@@ -43,17 +51,6 @@
       </button>
     </nav>
 
-    <!-- New Note Button at bottom of sidebar -->
-    <div class="p-3 border-t border-gray-200 dark:border-gray-700">
-      <button 
-        (click)="openNewNote()"
-        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
-        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-        </svg>
-        New Note
-      </button>
-    </div>
   </aside>
 
   <!-- ===================== MAIN CONTENT ===================== -->
@@ -301,7 +298,7 @@
               {type:'bold', label:'B'}, {type:'italic', label:'I'},
               {type:'list', label:'•'}, {type:'checklist', label:'☑'},
               {type:'link', label:'🔗'}, {type:'code', label:'</>'},
-              {type:'codeblock', label:'```'}, {type:'quote', label:'❝'}, {type:'hr', label:'—'}
+              {type:'codeblock', label:'```'}, {type:'quote', label:'❝'}, {type:'hr', label:'-'}
             ]"
               (click)="insertMarkdown(btn.type)"
               [title]="btn.type"

@@ -21,6 +21,8 @@ export class RegisterComponent {
   password = '';
   confirmPassword = '';
   loading = false;
+  showPassword = false;
+  showConfirmPassword = false;
 
   async onRegister() {
     if (!this.email || !this.password || !this.confirmPassword) {

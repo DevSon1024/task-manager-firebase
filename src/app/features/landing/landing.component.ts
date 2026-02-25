@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, AfterViewInit, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme-toggle.component';
@@ -10,7 +10,7 @@ import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme
   template: `
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white overflow-x-hidden font-sans transition-colors duration-300 selection:bg-blue-500 selection:text-white">
       
-      <!-- Glassmorphic Navbar — hidden when mobile drawer is open -->
+      <!-- Glassmorphic Navbar - hidden when mobile drawer is open -->
       <nav *ngIf="!mobileMenuOpen"
            [class.-translate-y-full]="navHidden"
            class="fixed top-0 inset-x-0 z-50 transition-all duration-300 border-b border-white/20 dark:border-white/10 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-lg shadow-gray-200/20 dark:shadow-black/20">
@@ -37,7 +37,7 @@ import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme
                 </svg>     
                </span>
             </div>
-            <span class="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300">TaskFlow</span>
+            <span class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">TaskFlow</span>
           </div>
           <div class="flex items-center space-x-4 md:space-x-8">
             <app-theme-toggle></app-theme-toggle>
@@ -111,7 +111,7 @@ import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
             </svg>
-            Get Started — It's Free
+            Get Started - It's Free
           </a>
 
           <!-- Divider -->
@@ -156,15 +156,55 @@ import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme
       <!-- Hero Section -->
       <div class="relative pt-32 pb-32 lg:pt-48 lg:pb-52 overflow-hidden">
         
-        <!-- Detailed Background Animations -->
+        <!-- Hero Background Illustration -->
         <div class="absolute inset-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-          <!-- Animated Blobs -->
-          <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-500/30 rounded-full blur-[100px] mix-blend-multiply dark:mix-blend-screen opacity-70 animate-blob"></div>
-          <div class="absolute top-[20%] right-[-10%] w-[500px] h-[500px] bg-blue-500/30 rounded-full blur-[100px] mix-blend-multiply dark:mix-blend-screen opacity-70 animate-blob animation-delay-2000"></div>
-          <div class="absolute bottom-[-10%] left-[20%] w-[500px] h-[500px] bg-pink-500/30 rounded-full blur-[100px] mix-blend-multiply dark:mix-blend-screen opacity-70 animate-blob animation-delay-4000"></div>
-          
-          <!-- Grid Overlay for texture -->
-          <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
+          <!-- SVG abstract illustration -->
+          <svg class="absolute inset-0 w-full h-full animate-hero-float" viewBox="0 0 1440 800" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <!-- Soft gradient background glow -->
+            <circle cx="720" cy="400" r="500" fill="url(#hero-glow)" opacity="0.15"/>
+            
+            <!-- Floating cards -->
+            <rect x="180" y="200" width="220" height="140" rx="16" class="fill-blue-500/[0.07] dark:fill-blue-400/[0.08] stroke-blue-500/[0.12] dark:stroke-blue-400/[0.15]" stroke-width="1.5" transform="rotate(-6 290 270)"/>
+            <rect x="200" y="230" width="160" height="10" rx="5" class="fill-blue-500/[0.08] dark:fill-blue-400/[0.1]"/>
+            <rect x="200" y="252" width="110" height="8" rx="4" class="fill-gray-400/[0.06] dark:fill-gray-300/[0.06]"/>
+            <circle cx="215" cy="290" r="10" class="fill-blue-500/[0.1] dark:fill-blue-400/[0.12]"/>
+            
+            <rect x="1050" y="160" width="240" height="160" rx="16" class="fill-purple-500/[0.07] dark:fill-purple-400/[0.08] stroke-purple-500/[0.12] dark:stroke-purple-400/[0.15]" stroke-width="1.5" transform="rotate(4 1170 240)"/>
+            <rect x="1074" y="195" width="180" height="10" rx="5" class="fill-purple-500/[0.08] dark:fill-purple-400/[0.1]"/>
+            <rect x="1074" y="218" width="120" height="8" rx="4" class="fill-gray-400/[0.06] dark:fill-gray-300/[0.06]"/>
+            <rect x="1074" y="260" width="190" height="6" rx="3" class="fill-green-500/[0.12] dark:fill-green-400/[0.15]"/>
+            
+            <rect x="600" y="520" width="260" height="150" rx="16" class="fill-indigo-500/[0.06] dark:fill-indigo-400/[0.07] stroke-indigo-500/[0.1] dark:stroke-indigo-400/[0.12]" stroke-width="1.5" transform="rotate(2 730 595)"/>
+            <rect x="624" y="555" width="140" height="10" rx="5" class="fill-indigo-500/[0.08] dark:fill-indigo-400/[0.1]"/>
+            <rect x="624" y="578" width="200" height="8" rx="4" class="fill-gray-400/[0.06] dark:fill-gray-300/[0.06]"/>
+            
+            <!-- Floating dots / circles -->
+            <circle cx="450" cy="150" r="6" class="fill-blue-400/[0.15] dark:fill-blue-300/[0.2]"/>
+            <circle cx="950" cy="450" r="8" class="fill-purple-400/[0.15] dark:fill-purple-300/[0.2]"/>
+            <circle cx="300" cy="550" r="5" class="fill-pink-400/[0.12] dark:fill-pink-300/[0.15]"/>
+            <circle cx="1200" cy="500" r="7" class="fill-indigo-400/[0.12] dark:fill-indigo-300/[0.15]"/>
+            <circle cx="150" cy="380" r="4" class="fill-cyan-400/[0.15] dark:fill-cyan-300/[0.2]"/>
+            <circle cx="1300" cy="350" r="5" class="fill-blue-400/[0.12] dark:fill-blue-300/[0.15]"/>
+            
+            <!-- Grid dots -->
+            <g class="fill-gray-400/[0.08] dark:fill-gray-500/[0.08]">
+              <circle cx="100" cy="100" r="2"/><circle cx="160" cy="100" r="2"/><circle cx="220" cy="100" r="2"/><circle cx="280" cy="100" r="2"/>
+              <circle cx="100" cy="160" r="2"/><circle cx="160" cy="160" r="2"/><circle cx="220" cy="160" r="2"/><circle cx="280" cy="160" r="2"/>
+              <circle cx="1160" cy="600" r="2"/><circle cx="1220" cy="600" r="2"/><circle cx="1280" cy="600" r="2"/><circle cx="1340" cy="600" r="2"/>
+              <circle cx="1160" cy="660" r="2"/><circle cx="1220" cy="660" r="2"/><circle cx="1280" cy="660" r="2"/><circle cx="1340" cy="660" r="2"/>
+            </g>
+            
+            <!-- Connecting lines -->
+            <line x1="400" y1="200" x2="550" y2="350" class="stroke-blue-400/[0.06] dark:stroke-blue-300/[0.08]" stroke-width="1" stroke-dasharray="6 6"/>
+            <line x1="900" y1="300" x2="750" y2="500" class="stroke-purple-400/[0.06] dark:stroke-purple-300/[0.08]" stroke-width="1" stroke-dasharray="6 6"/>
+            
+            <defs>
+              <radialGradient id="hero-glow" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0%" stop-color="#6366f1" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+          </svg>
         </div>
 
         <div class="relative z-10 max-w-7xl mx-auto px-6 text-center">
@@ -178,7 +218,7 @@ import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme
 
           <h1 class="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight mb-8 leading-tight text-gray-900 dark:text-white animate-fade-in-up animation-delay-100">
             Organize work.<br/>
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 animate-gradient-x">Amplify productivity.</span>
+            <span class="text-blue-600 dark:text-blue-400">Amplify productivity.</span>
           </h1>
           
           <p class="max-w-2xl mx-auto text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-10 leading-relaxed drop-shadow-sm animate-fade-in-up animation-delay-200">
@@ -273,11 +313,11 @@ import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme
       </div>
       
       <!-- SECTION 1: Features with placeholder screenshots -->
-      <section class="py-24 bg-white dark:bg-gray-900">
+      <section #revealEl class="reveal py-24 bg-white dark:bg-gray-900">
         <div class="max-w-7xl mx-auto px-6">
           <div class="text-center mb-16">
             <span class="inline-block px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 mb-4">Everything you need</span>
-            <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-4">Built for how you <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">actually work</span></h2>
+            <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-4">Built for how you <span class="text-blue-600 dark:text-blue-400">actually work</span></h2>
             <p class="max-w-2xl mx-auto text-lg text-gray-500 dark:text-gray-400">From quick task captures to deep note-taking sessions, TaskFlow adapts to your workflow.</p>
           </div>
 
@@ -389,18 +429,18 @@ import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme
                   (click)="$event.stopPropagation(); lightboxIndex = i"
                   [class.scale-125]="i === lightboxIndex"
                   [class.bg-white]="i === lightboxIndex"
-                  [class.bg-white/40]="i !== lightboxIndex"
+                  [class.bg-white40]="i !== lightboxIndex"
                   class="w-2 h-2 rounded-full transition-all duration-200">
           </button>
         </div>
       </div>
 
       <!-- SECTION 2: How It Works -->
-      <section class="py-24 bg-gray-50 dark:bg-gray-950">
+      <section #revealEl class="reveal py-24 bg-gray-50 dark:bg-gray-950">
         <div class="max-w-5xl mx-auto px-6">
           <div class="text-center mb-14">
             <span class="inline-block px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 mb-4">Simple by design</span>
-            <h2 class="text-4xl font-extrabold text-gray-900 dark:text-white mb-4">Up and running in <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">3 steps</span></h2>
+            <h2 class="text-4xl font-extrabold text-gray-900 dark:text-white mb-4">Up and running in <span class="text-indigo-600 dark:text-indigo-400">3 steps</span></h2>
           </div>
           <div class="grid md:grid-cols-3 gap-8">
             <div *ngFor="let step of howItWorks; let i = index" class="relative text-center group">
@@ -414,7 +454,7 @@ import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme
       </section>
 
       <!-- SECTION 3: Feature Grid -->
-      <section class="py-20 bg-white dark:bg-gray-900">
+      <section #revealEl class="reveal py-20 bg-white dark:bg-gray-900">
         <div class="max-w-6xl mx-auto px-6">
           <div class="text-center mb-12"><h2 class="text-3xl font-extrabold text-gray-900 dark:text-white">Everything in one place</h2></div>
           <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -428,7 +468,7 @@ import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme
       </section>
 
       <!-- SECTION 4: CTA Banner -->
-      <section class="py-20 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 relative overflow-hidden">
+      <section #revealEl class="reveal py-20 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 relative overflow-hidden">
         <div class="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl pointer-events-none"></div>
         <div class="absolute bottom-0 right-0 w-64 h-64 bg-white/10 rounded-full translate-x-1/2 translate-y-1/2 blur-3xl pointer-events-none"></div>
         <div class="relative max-w-3xl mx-auto text-center px-6">
@@ -445,7 +485,6 @@ import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme
 
       <footer class="bg-white border-t border-gray-200 dark:bg-gray-900 dark:border-gray-800 py-12 text-center text-gray-600 dark:text-gray-500 transition-colors duration-300">
          <div class="flex justify-center space-x-6 mb-8">
-            <a href="#" class="text-gray-400 hover:text-blue-500 transition-colors"><span class="sr-only">Twitter</span><svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg></a>
             <a href="https://github.com/DevSon1024/task-manager-firebase" target="_blank" class="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"><span class="sr-only">GitHub</span><svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg></a>
          </div>
          <p>&copy; {{ currentYear }} TaskFlow. All rights reserved.</p>
@@ -453,21 +492,6 @@ import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme
     </div>
   `,
   styles: [`
-    @keyframes blob {
-      0% { transform: translate(0px, 0px) scale(1); }
-      33% { transform: translate(30px, -50px) scale(1.1); }
-      66% { transform: translate(-20px, 20px) scale(0.9); }
-      100% { transform: translate(0px, 0px) scale(1); }
-    }
-    .animate-blob {
-      animation: blob 7s infinite;
-    }
-    .animation-delay-2000 {
-      animation-delay: 2s;
-    }
-    .animation-delay-4000 {
-      animation-delay: 4s;
-    }
     .perspective-1000 {
       perspective: 1000px;
     }
@@ -477,10 +501,12 @@ import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme
     .animate-shine {
       animation: shine 0.7s;
     }
-    @keyframes float {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-10px); }
-        100% { transform: translateY(0px); }
+    @keyframes heroFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-18px); }
+    }
+    .animate-hero-float {
+      animation: heroFloat 8s ease-in-out infinite;
     }
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(20px); }
@@ -494,9 +520,21 @@ import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme
     .animation-delay-200 { animation-delay: 0.2s; }
     .animation-delay-300 { animation-delay: 0.3s; }
     .animation-delay-500 { animation-delay: 0.5s; }
+
+    /* Scroll reveal */
+    :host .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    :host .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
   `]
 })
-export class LandingComponent {
+export class LandingComponent implements AfterViewInit {
+  @ViewChildren('revealEl') revealElements!: QueryList<ElementRef>;
   mobileMenuOpen = false;
   currentYear = new Date().getFullYear();
   navHidden = false;
@@ -525,7 +563,7 @@ export class LandingComponent {
     'Press / anywhere to open instantly',
     'Searches tasks AND notes simultaneously',
     'Highlighted keyword matches in results',
-    'Debounced — no unnecessary requests',
+    'Debounced - no unnecessary requests',
   ];
 
   kanbanCols = [
@@ -569,11 +607,27 @@ export class LandingComponent {
     if (currentY < this.scrollThreshold) {
       this.navHidden = false;
     } else if (currentY > this.lastScrollY + 5) {
-      this.navHidden = true;  // scrolling down — hide
+      this.navHidden = true;  // scrolling down - hide
     } else if (currentY < this.lastScrollY - 5) {
-      this.navHidden = false; // scrolling up — show
+      this.navHidden = false; // scrolling up - show
     }
     this.lastScrollY = currentY;
+  }
+
+  ngAfterViewInit(): void {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+
+    this.revealElements.forEach((el) => observer.observe(el.nativeElement));
   }
 
   @HostListener('document:keydown', ['$event'])

@@ -22,7 +22,7 @@ import { Note } from '../../../core/models/note.model';
     <!-- Full-screen click-trap backdrop (invisible) -->
     <div class="fixed inset-0 z-40" (click)="close.emit()"></div>
 
-    <!-- Floating search panel — anchored below the navbar -->
+    <!-- Floating search panel - anchored below the navbar -->
     <div class="fixed top-0 inset-x-0 z-50 flex justify-center px-4 pt-4 md:pt-16 pointer-events-none">
       <div class="w-full max-w-2xl pointer-events-auto search-panel" #panel>
 
@@ -232,7 +232,7 @@ export class SearchOverlayComponent implements OnInit, OnDestroy, AfterViewInit 
       switchMap(u => u ? this.noteService.getUserNotes() : of([]))
     ).subscribe(notes => { this.allNotes = notes; this.runSearch(); });
 
-    // Debounced search — only runs 300ms after user stops typing
+    // Debounced search - only runs 300ms after user stops typing
     const qSub = this.querySubject.pipe(
       debounceTime(300),
       distinctUntilChanged()

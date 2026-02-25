@@ -15,7 +15,7 @@
 
       <!-- Greeting and User Profile Section -->
       <div class="flex items-center space-x-3 md:space-x-4">
-        <!-- Search Button — hidden while search panel is open -->
+        <!-- Search Button - hidden while search panel is open -->
         <button 
           *ngIf="!(searchService.isSearchOpen$ | async)"
           (click)="toggleSearch()"
@@ -37,7 +37,7 @@
         </div>
 
         <!-- Profile Dropdown -->
-        <div class="relative">
+        <div class="relative z-[60]">
           <button 
             type="button"
             (click)="toggleProfileMenu($event)"
@@ -139,5 +139,5 @@
 <!-- Click Outside to Close Menu -->
 <div *ngIf="isProfileMenuOpen" 
      (click)="closeProfileMenu()"
-     class="fixed inset-0 z-40"></div>
+     class="fixed inset-0 z-50"></div>
 

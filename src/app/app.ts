@@ -42,9 +42,11 @@ import { TaskFormComponent } from './features/tasks/task-form/task-form.componen
         
         <!-- Main Content Area -->
         <div class="flex-1 flex flex-col h-full min-w-0" [ngClass]="showSidebar ? 'md:ml-20' : ''">
-           <!-- Navbar: collapses height (not transform) to avoid content crop -->
-           <div class="shrink-0 overflow-hidden transition-[max-height] duration-300 ease-in-out"
-                [style.max-height]="showNavbar ? (layoutService.isNavbarHidden() ? '0px' : '80px') : '0px'">
+           <!-- Navbar: slides up when hidden but never clips overflow (so dropdown remains visible) -->
+           <div class="shrink-0 transition-all duration-300 ease-in-out relative z-40"
+                [class.-mt-20]="showNavbar && layoutService.isNavbarHidden()"
+                [class.opacity-0]="showNavbar && layoutService.isNavbarHidden()"
+                [class.pointer-events-none]="showNavbar && layoutService.isNavbarHidden()">
              <app-navbar *ngIf="showNavbar"></app-navbar>
            </div>
 
