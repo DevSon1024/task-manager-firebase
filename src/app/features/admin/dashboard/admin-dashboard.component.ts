@@ -1,9 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { SystemAnalyticsService, SystemAnalytics } from '../../../core/services/system-analytics.service';
 import { User } from '../../../core/models/user.model';
 import { Observable, map, tap } from 'rxjs';
 
@@ -14,21 +15,28 @@ import { Observable, map, tap } from 'rxjs';
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']
 })
-export class AdminDashboardComponent implements OnInit {
+export class AdminDashboardComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
+  private analyticsService = inject(SystemAnalyticsService);
 
   users$: Observable<User[]> | undefined;
   currentUser: any;
+  usersList: User[] = [];
 
   // State Management
   activeTab: 'analytics' | 'users' = 'analytics';
 
   // Analytics Metrics
   totalUsers = 0;
-  activeUsersCount = 0;
+  activeUsersThisMonth = 0;
   adminUsersCount = 0;
+
+  // System Analytics
+  analytics: SystemAnalytics | null = null;
+  analyticsLoading = false;
+  private refreshInterval: any;
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
@@ -36,11 +44,65 @@ export class AdminDashboardComponent implements OnInit {
     // Fetch users and calculate metrics
     this.users$ = this.userService.getUsers().pipe(
       tap(users => {
+        this.usersList = users;
         this.totalUsers = users.length;
-        this.activeUsersCount = users.filter(u => u.isActive !== false).length;
+        const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+        this.activeUsersThisMonth = users.filter(u => u.lastSeen && u.lastSeen.toMillis && u.lastSeen.toMillis() >= thirtyDaysAgo).length;
         this.adminUsersCount = users.filter(u => u.role === 'admin').length;
       })
     );
+
+    // Load system analytics
+    this.loadAnalytics();
+
+    // Auto-refresh every 30 seconds
+    this.refreshInterval = setInterval(() => {
+      if (this.activeTab === 'analytics') {
+        this.loadAnalytics(true);
+      }
+    }, 30000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+    }
+  }
+
+  async loadAnalytics(silent = false): Promise<void> {
+    if (!silent) this.analyticsLoading = true;
+    try {
+      this.analytics = await this.analyticsService.getAnalytics();
+    } catch (err) {
+      console.error('Failed to load analytics:', err);
+      if (!silent) this.toastService.error('Failed to load system analytics.');
+    } finally {
+      this.analyticsLoading = false;
+    }
+  }
+
+  async refreshAnalytics(): Promise<void> {
+    this.analyticsLoading = true;
+    await this.loadAnalytics();
+    this.toastService.success('Analytics refreshed.');
+  }
+
+  getPerformanceColor(ms: number): string {
+    if (ms < 200) return 'text-green-500';
+    if (ms < 500) return 'text-yellow-500';
+    return 'text-red-500';
+  }
+
+  getSuccessRateColor(rate: number): string {
+    if (rate >= 99) return 'text-green-500';
+    if (rate >= 95) return 'text-yellow-500';
+    return 'text-red-500';
+  }
+
+  getSuccessRateBg(rate: number): string {
+    if (rate >= 99) return 'bg-green-500';
+    if (rate >= 95) return 'bg-yellow-500';
+    return 'bg-red-500';
   }
 
   setTab(tab: 'analytics' | 'users') {
@@ -116,5 +178,10 @@ export class AdminDashboardComponent implements OnInit {
   // Helper for Last Seen display
   isUserOnline(lastSeen: any): boolean {
     return true; // placeholder template mapping handled separately if needed
+  }
+
+  getUserName(uid: string): string {
+    const user = this.usersList.find(u => u.uid === uid);
+    return user?.displayName || 'Unknown User';
   }
 }

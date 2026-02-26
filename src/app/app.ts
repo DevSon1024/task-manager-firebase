@@ -135,7 +135,7 @@ export class App implements OnInit, AfterViewInit {
 
   onMainScroll(event: Event): void {
     const target = event.target as HTMLElement;
-    this.layoutService.onMainScroll(target.scrollTop);
+    this.layoutService.onMainScroll(target.scrollTop, target.scrollHeight, target.clientHeight);
   }
 
   private updateLayoutVisibility(): void {

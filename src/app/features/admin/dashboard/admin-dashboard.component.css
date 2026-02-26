@@ -1,1 +1,46 @@
-/* Add component specific styles here if needed */
+/* Analytics card animations */
+.analytics-card {
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stagger animation for grid items */
+.analytics-card:nth-child(1) { animation-delay: 0ms; }
+.analytics-card:nth-child(2) { animation-delay: 80ms; }
+.analytics-card:nth-child(3) { animation-delay: 160ms; }
+.analytics-card:nth-child(4) { animation-delay: 240ms; }
+
+/* Refresh spinner */
+.analytics-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Storage bar glow */
+.storage-bar {
+  box-shadow: 0 0 6px rgba(251, 191, 36, 0.4);
+}
+
+/* Fade-in animation */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

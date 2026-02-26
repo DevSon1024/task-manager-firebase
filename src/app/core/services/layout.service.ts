@@ -36,7 +36,7 @@ export class LayoutService {
     this.isGlobalCreateTaskOpen.set(false);
   }
 
-  onMainScroll(scrollTop: number): void {
+  onMainScroll(scrollTop: number, scrollHeight?: number, clientHeight?: number): void {
     if (scrollTop < this.scrollThreshold) {
       this.isNavbarHidden.set(false);
     } else if (scrollTop > this.lastScrollY + 5) {
@@ -44,7 +44,12 @@ export class LayoutService {
       this.isNavbarHidden.set(true);
     } else if (scrollTop < this.lastScrollY - 5) {
       // Scrolling up
-      this.isNavbarHidden.set(false);
+      // Prevent unhiding if the browser auto-adjusted the scroll boundary because of container resizing (navbar hiding)
+      if (scrollHeight && clientHeight && (scrollTop + clientHeight >= scrollHeight - 2)) {
+        // We are at the bottom of the page; downward scroll caused the container to grow, forcing an apparent upward scroll.
+      } else {
+        this.isNavbarHidden.set(false);
+      }
     }
     this.lastScrollY = scrollTop;
   }
