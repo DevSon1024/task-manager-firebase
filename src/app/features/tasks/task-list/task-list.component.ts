@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Task } from '../../../core/models/task.model';
@@ -31,9 +32,11 @@ export class TaskListComponent implements OnInit, OnDestroy {
   private taskService = inject(TaskService);
   private toastService = inject(ToastService);
   private searchService = inject(SearchService);
+  private route = inject(ActivatedRoute);
 
   tasks$!: Observable<Task[]>;
   private tasksSub?: Subscription;
+  private routeSub?: Subscription;
   // searchTerm$ removed in favor of SearchService
   
   todoTasks: Task[] = [];
@@ -86,10 +89,23 @@ export class TaskListComponent implements OnInit, OnDestroy {
       // Sort each column by date descending (optional, but good for UX)
       // Note: original query sorts by createdAt desc. 
     });
+
+    // Check for open task in query params
+    this.routeSub = combineLatest([this.tasks$, this.route.queryParams]).subscribe(([tasks, params]) => {
+       const openTaskId = params['open'];
+       if (openTaskId && tasks.length > 0) {
+          const targetTask = tasks.find(t => t.id === openTaskId);
+          if (targetTask && this.viewingTask?.id !== targetTask.id && this.editingTask?.id !== targetTask.id) {
+             // Avoid re-opening if already open
+             this.openViewModal(targetTask);
+          }
+       }
+    });
   }
 
   ngOnDestroy() {
     this.tasksSub?.unsubscribe();
+    this.routeSub?.unsubscribe();
   }
 
 

@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MarkdownModule } from 'ngx-markdown';
 import { NoteService } from '../../core/services/note.service';
@@ -21,6 +22,8 @@ export class NotesComponent implements OnInit, OnDestroy {
   private noteService = inject(NoteService);
   private taskService = inject(TaskService);
   private toastService = inject(ToastService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   notes: Note[] = [];
   tasks: Task[] = [];
@@ -61,6 +64,7 @@ export class NotesComponent implements OnInit, OnDestroy {
 
   private notesSubscription?: Subscription;
   private tasksSubscription?: Subscription;
+  private routeSub?: Subscription;
 
   ngOnInit(): void {
     this.notesSubscription = this.noteService.getUserNotes().subscribe(notes => {
@@ -72,11 +76,25 @@ export class NotesComponent implements OnInit, OnDestroy {
     this.tasksSubscription = this.taskService.getUserTasks().subscribe(tasks => {
       this.tasks = tasks;
     });
+
+    // Check for open note in query params
+    this.routeSub = this.route.queryParams.subscribe(params => {
+       const openNoteId = params['open'];
+       if (openNoteId && this.notes.length > 0) {
+          const targetNote = this.notes.find(n => n.id === openNoteId);
+          if (targetNote && this.editingNote?.id !== targetNote.id) {
+             this.openEditNote(targetNote);
+             // Default to preview mode for "viewing"
+             this.activeEditorTab = 'preview'; 
+          }
+       }
+    });
   }
 
   ngOnDestroy(): void {
     this.notesSubscription?.unsubscribe();
     this.tasksSubscription?.unsubscribe();
+    this.routeSub?.unsubscribe();
   }
 
   buildCategories(): void {
@@ -136,6 +154,11 @@ export class NotesComponent implements OnInit, OnDestroy {
     this.isEditorOpen = false;
     this.editingNote = null;
     this.isNewNote = false;
+    
+    // Clear query params if any
+    if (this.route.snapshot.queryParams['open']) {
+       this.router.navigate([], { queryParams: { open: null }, queryParamsHandling: 'merge' });
+    }
   }
 
   addTag(): void {

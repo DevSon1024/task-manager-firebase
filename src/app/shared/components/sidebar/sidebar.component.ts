@@ -26,6 +26,7 @@ export class SidebarComponent implements OnInit {
   userProfile: UserProfile | null = null;
   isAdmin = false;
   isAdminDashboardExpanded = false;
+  isExpanded = false;
 
   ngOnInit(): void {
     this.userProfileService.userProfile$.subscribe(profile => {
@@ -37,16 +38,22 @@ export class SidebarComponent implements OnInit {
     // Close sidebar on route change (for mobile)
     this.router.events.subscribe(() => {
        this.layoutService.closeSidebar();
+       this.isExpanded = false;
     });
   }
 
   openCreateTask(): void {
     this.layoutService.openGlobalCreateTask();
     this.layoutService.closeSidebar(); // close on mobile
+    this.isExpanded = false;
   }
 
   toggleAdminDashboard() {
     this.isAdminDashboardExpanded = !this.isAdminDashboardExpanded;
+  }
+
+  toggleExpand() {
+    this.isExpanded = !this.isExpanded;
   }
 
   async logout() {
@@ -56,5 +63,6 @@ export class SidebarComponent implements OnInit {
   
   close() {
     this.layoutService.closeSidebar();
+    this.isExpanded = false;
   }
 }

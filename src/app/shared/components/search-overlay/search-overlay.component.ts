@@ -122,10 +122,17 @@ import { Note } from '../../../core/models/note.model';
               </div>
               <div class="space-y-0.5">
                 <div *ngFor="let note of filteredNotes.slice(0, 5)"
-                  (click)="goToNotes()"
+                  (click)="goToNotes(note)"
                   class="flex items-start gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group">
 
-                  <div class="h-2.5 w-2.5 rounded-full bg-purple-400 shrink-0 mt-1.5"></div>
+                  <div [ngClass]="{
+                    'bg-yellow-400': note.color === 'yellow',
+                    'bg-blue-400': note.color === 'blue',
+                    'bg-green-400': note.color === 'green',
+                    'bg-purple-400': note.color === 'purple',
+                    'bg-pink-400': note.color === 'pink',
+                    'bg-gray-400': !note.color
+                  }" class="h-2.5 w-2.5 rounded-full shrink-0 mt-1.5"></div>
 
                   <div class="flex-1 min-w-0">
                     <p class="text-sm font-medium text-gray-900 dark:text-white truncate"
@@ -287,7 +294,7 @@ export class SearchOverlayComponent implements OnInit, OnDestroy, AfterViewInit 
   goToTasks(task: Task): void {
     this.searchService.updateQuery(this.searchQuery);
     this.close.emit();
-    this.router.navigate(['/tasks']);
+    this.router.navigate(['/tasks'], { queryParams: { open: task.id } });
   }
 
   goToTasksAll(): void {
@@ -295,8 +302,12 @@ export class SearchOverlayComponent implements OnInit, OnDestroy, AfterViewInit 
     this.router.navigate(['/tasks']);
   }
 
-  goToNotes(): void {
+  goToNotes(note?: Note): void {
     this.close.emit();
-    this.router.navigate(['/notes']);
+    if (note?.id) {
+       this.router.navigate(['/notes'], { queryParams: { open: note.id } });
+    } else {
+       this.router.navigate(['/notes']);
+    }
   }
 }
