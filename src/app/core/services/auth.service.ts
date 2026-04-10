@@ -10,7 +10,12 @@ import {
   User as FirebaseUser,
   setPersistence,
   browserLocalPersistence,
-  indexedDBLocalPersistence
+  indexedDBLocalPersistence,
+  sendPasswordResetEmail,
+  updatePassword as firebaseUpdatePassword,
+  reauthenticateWithCredential,
+  linkWithCredential,
+  EmailAuthProvider
 } from '@angular/fire/auth';
 import { 
   Firestore, 
@@ -225,6 +230,55 @@ export class AuthService {
       this.router.navigate(['/admin']);
     } else {
       this.router.navigate(['/dashboard']);
+    }
+  }
+
+  // Get provider IDs for the current user (e.g. 'password', 'google.com')
+  getProviders(): string[] {
+    const user = this.auth.currentUser;
+    if (!user) return [];
+    return user.providerData.map(p => p.providerId);
+  }
+
+  // Send a password-reset email to the current user's email
+  async sendPasswordResetEmail(): Promise<void> {
+    const user = this.auth.currentUser;
+    if (!user || !user.email) throw new Error('No authenticated user found.');
+    try {
+      await sendPasswordResetEmail(this.auth, user.email);
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  // Change password for email/password users (requires re-authentication)
+  async updatePassword(currentPassword: string, newPassword: string): Promise<void> {
+    const user = this.auth.currentUser;
+    if (!user || !user.email) throw new Error('No authenticated user found.');
+    try {
+      const credential = EmailAuthProvider.credential(user.email, currentPassword);
+      await reauthenticateWithCredential(user, credential);
+      await firebaseUpdatePassword(user, newPassword);
+    } catch (error: any) {
+      if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        throw new Error('Incorrect current password. Please try again.');
+      }
+      throw new Error(error.message);
+    }
+  }
+
+  // Link email+password to a Google-only account so user can also sign in with email/password
+  async linkEmailPassword(password: string): Promise<void> {
+    const user = this.auth.currentUser;
+    if (!user || !user.email) throw new Error('No authenticated user found.');
+    try {
+      const credential = EmailAuthProvider.credential(user.email, password);
+      await linkWithCredential(user, credential);
+    } catch (error: any) {
+      if (error.code === 'auth/provider-already-linked') {
+        throw new Error('This account already has a password set.');
+      }
+      throw new Error(error.message);
     }
   }
 }

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserProfileService, UserProfile } from '../../core/services/user-profile.service';
 import { UserService } from '../../core/services/user.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-profile',
@@ -15,6 +16,7 @@ import { UserService } from '../../core/services/user.service';
 export class ProfileComponent implements OnInit {
   private userProfileService = inject(UserProfileService);
   private userService = inject(UserService);
+  private authService = inject(AuthService);
   private router = inject(Router);
 
   userProfile: UserProfile | null = null;
@@ -25,8 +27,37 @@ export class ProfileComponent implements OnInit {
 
   editForm: Partial<UserProfile> = {};
 
+  // ----- Provider helpers -----
+  providers: string[] = [];
+
+  get isEmailPasswordUser(): boolean {
+    return this.providers.includes('password');
+  }
+
+  get isGoogleOnlyUser(): boolean {
+    return this.providers.includes('google.com') && !this.providers.includes('password');
+  }
+
+  // ----- Change Password (email/password users) -----
+  passwordForm = { currentPassword: '', newPassword: '', confirmPassword: '' };
+  isChangingPassword = false;
+  passwordError = '';
+  passwordSuccess = '';
+  showCurrentPassword = false;
+  showNewPassword = false;
+  showConfirmPassword = false;
+
+  // ----- Add Password (Google-only users) -----
+  addPasswordForm = { newPassword: '', confirmPassword: '' };
+  isAddingPassword = false;
+  addPasswordError = '';
+  addPasswordSuccess = '';
+  showAddNewPassword = false;
+  showAddConfirmPassword = false;
+
   ngOnInit(): void {
     this.loadProfile();
+    this.providers = this.authService.getProviders();
   }
 
   private loadProfile(): void {
@@ -73,6 +104,78 @@ export class ProfileComponent implements OnInit {
     }
   }
 
+  // ----- Password Change -----
+  async changePassword(): Promise<void> {
+    this.passwordError = '';
+    this.passwordSuccess = '';
+
+    if (!this.passwordForm.currentPassword) {
+      this.passwordError = 'Please enter your current password.';
+      return;
+    }
+    if (this.passwordForm.newPassword.length < 6) {
+      this.passwordError = 'New password must be at least 6 characters.';
+      return;
+    }
+    if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
+      this.passwordError = 'New passwords do not match.';
+      return;
+    }
+
+    this.isChangingPassword = true;
+    try {
+      await this.authService.updatePassword(this.passwordForm.currentPassword, this.passwordForm.newPassword);
+      this.passwordSuccess = 'Password updated successfully!';
+      this.passwordForm = { currentPassword: '', newPassword: '', confirmPassword: '' };
+      setTimeout(() => { this.passwordSuccess = ''; }, 4000);
+    } catch (error: any) {
+      this.passwordError = error.message || 'Failed to update password.';
+    } finally {
+      this.isChangingPassword = false;
+    }
+  }
+
+  async sendResetEmail(): Promise<void> {
+    this.passwordError = '';
+    this.passwordSuccess = '';
+    try {
+      await this.authService.sendPasswordResetEmail();
+      this.passwordSuccess = `Password reset email sent to ${this.userProfile?.email}. Check your inbox.`;
+      setTimeout(() => { this.passwordSuccess = ''; }, 6000);
+    } catch (error: any) {
+      this.passwordError = error.message || 'Failed to send reset email.';
+    }
+  }
+
+  // ----- Add Password (Google → Email+Password) -----
+  async addPassword(): Promise<void> {
+    this.addPasswordError = '';
+    this.addPasswordSuccess = '';
+
+    if (this.addPasswordForm.newPassword.length < 6) {
+      this.addPasswordError = 'Password must be at least 6 characters.';
+      return;
+    }
+    if (this.addPasswordForm.newPassword !== this.addPasswordForm.confirmPassword) {
+      this.addPasswordError = 'Passwords do not match.';
+      return;
+    }
+
+    this.isAddingPassword = true;
+    try {
+      await this.authService.linkEmailPassword(this.addPasswordForm.newPassword);
+      this.addPasswordSuccess = 'Password added! You can now sign in with your email and this password.';
+      this.addPasswordForm = { newPassword: '', confirmPassword: '' };
+      // Refresh providers list
+      this.providers = this.authService.getProviders();
+      setTimeout(() => { this.addPasswordSuccess = ''; }, 6000);
+    } catch (error: any) {
+      this.addPasswordError = error.message || 'Failed to add password.';
+    } finally {
+      this.isAddingPassword = false;
+    }
+  }
+
   goBack(): void {
     this.router.navigate(['/tasks']);
   }
@@ -92,7 +195,6 @@ export class ProfileComponent implements OnInit {
     try {
       await this.userService.updateUserRole(this.userProfile.uid, 'admin');
       alert('You are now an Admin! Please refresh the page or re-login.');
-      // location.reload();
     } catch (error) {
       console.error('Error promoting to admin:', error);
       alert('Failed to promote to admin.');
